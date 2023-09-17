@@ -1,0 +1,128 @@
+init {
+    entero_min, entero_max: Int *- Multiples variables -*
+    float_min: Float
+    float_max: Float
+    cad_min: String
+    cad_max: String
+    cad_any: String
+    id_mas_largo_id_mas_id_mas_largo_id_mas_: Int
+    id_fuera_de_rango_id_fuera_de_rango_id_fu: Int
+}
+
+*-
+    Comentario:
+        *-
+            Comentario 
+            anidado y 
+            multilinea
+        -*
+-*
+
+*- OK -*
+
+entero_min = -32768
+entero_max = 32768
+float_min = -2147483648.
+float_max = 2147483648.
+cad_min = ""
+cad_max = "0123456789012345678901234567890123456789"
+cad_any = "Cualquier cáracter: @!#'¿?"
+
+*- FLOAT FUERA DE RANGO -*
+
+float_min = -2147483649.
+float_max = 2147483649.
+
+*- INT FUERA DE RANGO -*
+
+entero_min = -32769
+entero_max = 32769
+
+*- STRING FUERA DE RANGO -*
+
+cad_min = ""
+cad_max = "0123456789012345678901234567890123456789+"
+cad_any = "Cualquier cáracter: @!#'¿?"
+
+*- FUNCIONES -*
+write(cad_any)
+write("hola, mundo")
+read(cad_min)
+cad_min = concatenarConRecorte("pepe", "pepito", 10)
+
+if(estaContenido("a", "abc")) {
+    timer(5, write("h"))
+}
+
+*- CONDICIONALES -*
+    *- Simples -*
+    if (a < b) {
+        write("hola")
+    }
+
+    if (a > b) {
+        write("hola")
+    }
+
+    if (a <= b) {
+        read(cad_any)
+    }
+
+    if (a >= b) {
+        write("hola")
+    }
+
+    if (a == b) {
+        write("hola")
+    }
+
+    if (a != b) {
+        write("hola")
+    }
+
+    if ( not a < b ) {
+        write("hola")
+    }
+
+    *- Dobles -*
+    if (a < b & b < c) {
+        write("hola")
+    }
+
+    if (a < b || b < c) {
+        write("hola")
+    }
+
+    *- Etc -*
+    if (a < b) {
+        write("hola")
+    }
+    else {
+        write(cad_any)
+    }
+    
+
+    if (a < b) {
+        write("hola")
+        if (a < b) {
+            write("cad_any")
+        }
+    }
+
+    if (not entero_min) {
+        write("pepe")
+    }
+   
+
+*- CICLO -*
+
+ciclo (a > b) {
+    write("hola")
+}
+
+ciclo (a > b) {
+    write("hola")
+    ciclo (c > b) {
+        write("hola")
+    }
+}

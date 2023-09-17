@@ -1,8 +1,10 @@
+#!/bin/bash
+
 ## Script para Unix
-flex Lexico.l
-bison -dyv Sintactico.y
-gcc lex.yy.c y.tab.c -o compilador
-./compilador prueba.txt
+flex lexico.l
+bison -dyv sintactico.y
+gcc lex.yy.c y.tab.c tab_simb.c -o lyc-compiler-1_0_0.exe
+./compilador "casos_de_prueba/test.txt"
 rm lex.yy.c
 rm y.tab.c
 rm y.output
