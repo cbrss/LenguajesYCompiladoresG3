@@ -1,12 +1,12 @@
 flex lexico.l
 bison -dyv sintactico.y
 
-gcc.exe lex.yy.c y.tab.c tab_simb.c -o lyc-compiler-1_0_0.exe
+gcc.exe lex.yy.c y.tab.c tab_simb.c arbol.c pila.c -o lyc-compiler-2.0.0.jar
 
-compilador.exe casos_de_prueba/test.txt
+lyc-compiler-2.0.0.jar casos_de_prueba/test.txt
 
 @echo off
-del lyc-compiler-1_0_0.exe
+del lyc-compiler-2.0.0.jar
 del lex.yy.c
 del y.tab.c
 del y.tab.h

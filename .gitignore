@@ -63,3 +63,10 @@ y.tab.c
 y.output
 y.tab.h
 compilador
+
+# VSCode
+.vscode
+
+# Archivos temporales
+intermediate-code.txt
+symbol-table.txt

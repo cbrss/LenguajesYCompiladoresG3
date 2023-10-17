@@ -1,12 +1,12 @@
 init {
-    entero_min, entero_max: Int *- Multiples variables -*
+    entero_min, a,b,c, entero_max: Int *- Multiples variables -*
     float_min: Float
     float_max: Float
-    cad_min: String
+    cad_min, test1,test2,test4,test5: String
     cad_max: String
     cad_any: String
     id_mas_largo_id_mas_id_mas_largo_id_mas_: Int
-    id_fuera_de_rango_id_fuera_de_rango_id_fu: Int
+ 
 }
 
 *-
@@ -48,7 +48,7 @@ cad_any = "Cualquier cáracter: @!#'¿?"
 write(cad_any)
 write("hola, mundo")
 read(cad_min)
-cad_min = concatenarConRecorte("pepe", "pepito", 10)
+cad_min = concatenarConRecorte("pepe", "pepito", 2)
 
 if(estaContenido("a", "abc")) {
     timer(5, write("h"))
@@ -57,6 +57,7 @@ if(estaContenido("a", "abc")) {
 *- CONDICIONALES -*
     *- Simples -*
     if (a < b) {
+        cad_min = "teeeest"
         write("hola")
     }
 
@@ -105,7 +106,7 @@ if(estaContenido("a", "abc")) {
     if (a < b) {
         write("hola")
         if (a < b) {
-            write("cad_any")
+            write("caad_anya")
         }
     }
 
@@ -121,8 +122,8 @@ ciclo (a > b) {
 }
 
 ciclo (a > b) {
-    write("hola")
-    ciclo (c > b) {
-        write("hola")
+    write("test3")
+    ciclo (a < b) {
+        write("test6")
     }
 }

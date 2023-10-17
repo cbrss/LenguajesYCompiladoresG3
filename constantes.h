@@ -7,3 +7,11 @@
 #define MAX_FLOAT 2147483648
 #define MIN_FLOAT -2147483648
 
+#define TRUE 1
+#define FALSE 0
+
+#define TINT "Int"
+#define TFLOAT "Float"
+#define TSTRING "String"
+
+#define MIN(a, b) ((a < b) ? a : b)
