@@ -19,6 +19,7 @@
     Lista listaIds;
     Pila anidaciones;
     Pila condAnidados;
+    int boolCompiladoOK = 1;
 
     NodoA* CompiladoPtr, *ProgramaPtr, *DeclaPtr, *BloPtr, *DecPtr, *ListPtr, *SentPtr, *AsigPtr, *tipoAux,
             *CicPtr, *EvalPtr, *Eptr, *StrPtr, *ConPtr, *CmpPtr, *EptrAux, *BloAux, *Tptr, *Fptr, *CmpAux, *StrPtrAux;
@@ -80,7 +81,13 @@
  
 %%
 programa_prima: 
-    programa    { printf("R1: COMPILADO\n"); compilado = ProgramaPtr; }
+    programa    { if(boolCompiladoOK == 1){
+                    printf("R1: COMPILACION EXITOSA\n");
+                }
+                else{
+                    printf("R1: ERROR DE COMPILACION\n");
+                }
+                ; compilado = ProgramaPtr; }
     ;
 programa: 
     INIT LLA declaraciones LLC bloque_ejec  { printf("\tR2: init { declaraciones} bloque_ejec es Programa\n"); ProgramaPtr = crearNodo("Programa", DeclaPtr, BloPtr); } 

@@ -24,6 +24,7 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
         strcat(nuevo_simbolo.nombre, nombre);
         strcpy(nuevo_simbolo.tipo_dato, TINT);
         strcpy(nuevo_simbolo.valor, nombre);
+        nuevo_simbolo.longitud = strlen(nombre);
     }
     else if (tDato == tFLOAT)
     {
@@ -31,9 +32,14 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
         strcat(nuevo_simbolo.nombre, nombre);
         strcpy(nuevo_simbolo.tipo_dato, TFLOAT);
         strcpy(nuevo_simbolo.valor, nombre);
+        nuevo_simbolo.longitud = strlen(nombre);
     }
     else if (tDato == tSTRING)
     {
+        char aux[] = "\"\"";
+        if(strcmp(nombre, aux) == 0){    //no guarda string vacios
+            return;
+        }
         int longitud = strlen(nombre) - 2; // -1 para sacar\0 -1 para "
         char nNombre[longitud - 2];
         strncpy(nNombre, nombre + 1, longitud); // saco los "" del string

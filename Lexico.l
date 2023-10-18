@@ -11,7 +11,7 @@
     char* yyltext;
 
     extern Lista listaSimbolos;
-
+    extern int boolCompiladoOK;
     int fa_validarLongitudID(char*);
     int fa_verificarRangoInt(char*);
     int fa_verificarRangoFloat(char*);
@@ -155,6 +155,7 @@ int fa_validarLongitudID(char* ptr) {
 
     if ( valor < 1 || valor > ID_LARGO_MAX) {
         printf ("[%d] Error, largo de ID fuera de rango\n", yylineno);
+        boolCompiladoOK=0;
         return FALSE;
     }
 
@@ -166,6 +167,7 @@ int fa_verificarRangoInt(char* ptr) {
 
     if ( valor < 0 || valor > MAX_INT) {
         printf ("[%d] Error, variable Int fuera de rango\n", yylineno);
+        boolCompiladoOK=0;
         return FALSE;
     }
 
@@ -177,6 +179,7 @@ int fa_verificarRangoFloat(char* ptr) {
 
     if ( valor < 0 || valor > 2147483648) {
         printf ("[%d] Error, variable Float fuera de rango\n", yylineno);
+        boolCompiladoOK=0;
         return FALSE;
     }
 
@@ -188,6 +191,7 @@ int fa_verificarRangoStr(char* ptr) {
 
     if ( valor < 2 || valor > STRING_LARGO_MAX + 2) {
         printf ("[%d] Error, variable String fuera de rango\n", yylineno);
+        boolCompiladoOK=0;
         return FALSE;
     }
 
