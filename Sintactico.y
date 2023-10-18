@@ -343,12 +343,17 @@ char* concatenar(char* str1, char* str2, int n){
         return "ERROR";
     } 
 
+
     char aux [strlen(str1) + strlen(str2) + 3]; //si n=0
     aux[0] = '"';
 
     strcpy(aux+ 1, str1+n+1); 
     strcpy(aux + strlen(aux) - 1, str2+n+1);  
     strcpy(str1, aux);
+
+    if(strlen(str1) >= STRING_LARGO_MAX + 3 ){   //+3 "" \0
+        return "ERROR";
+    }
    
     return str1;
 }
