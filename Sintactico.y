@@ -4,6 +4,7 @@
     #include "y.tab.h"
     #include "arbol.h"
     #include "pila.h"
+    #include "cola.h"
 
     int yystopparser=0;
     extern FILE* yyin;
@@ -19,11 +20,15 @@
     Lista listaIds;
     Pila anidaciones;
     Pila condAnidados;
+    Cola colaIds;
     int boolCompiladoOK = 1;
 
     NodoA* CompiladoPtr, *ProgramaPtr, *DeclaPtr, *BloPtr, *DecPtr, *ListPtr, *SentPtr, *AsigPtr, *tipoAux,
             *CicPtr, *EvalPtr, *Eptr, *StrPtr, *ConPtr, *CmpPtr, *EptrAux, *BloAux, *Tptr, *Fptr, *CmpAux, *StrPtrAux;
     NodoA* EjePtr, * ConAux;
+    NodoA* DecAsigPTr,* DecAsigMPtr,* ParamAsigPtr,* CtePtr;
+
+
     char  auxTipo[7], strAux[VALOR_LARGO_MAX + 1], strAux2[VALOR_LARGO_MAX + 1], cmpAux[3], opAux[3];
     int intAux;
 %}
@@ -47,11 +52,16 @@
 %token CONCAT
 %token TIMER
 %token ESTA_CONT
+%token ASIGCOMP
+%token CONT
+
 // ID
 %token <string_val>ID
 // Caracteres especiales   
 %token PA        
-%token PC        
+%token PC     
+%token CA
+%token CC   
 %token LLA      
 %token LLC      
 %token COMA      
@@ -169,7 +179,69 @@ sentencia:
         };
     SentPtr = crearNodo("=", crearHoja($3), crearHoja("READ"));
     }
+    |ASIGCOMP PA CA dec_asig_mul CC PC {
+        printf("\t\tRespecial1: asigcomp ( [ dec_asig ]) es Sentencia\n");
+        SentPtr = DecAsigMPtr;
+
+    }
+    |CONT PA expresion DOS_P DOS_P CA param_cont_mul CC PC {printf("\t\tRespecial2: !cont(expresion :: [param_cont_mul]) es Sentencia\n");}
     ;
+
+
+dec_asig_mul: 
+    ID {encolar(&colaIds, $1, sizeof($1));} CC DOS_P CA param_asig {
+        printf("\t\t\tRx3: ] : [ es cierre de Dec_asig_mul\n");
+        desencolar(&colaIds, strAux, sizeof(STRING_LARGO_MAX));
+        printf("\n*%s*", strAux);
+        printf("\n*ptr: %s*", (*ParamAsigPtr).simbolo);
+        DecAsigMPtr = crearNodo("=", crearHoja(strAux), ParamAsigPtr);
+      
+        }
+    |ID COMA {encolar(&colaIds, $1, sizeof($1));} dec_asig_mul COMA param_asig {
+        printf("\t\t\tRx2: , id dec_asig_mul param_asig , es Dec_asig_mul\n");
+        /*tal vez rompe el sizeof*/
+        desencolar(&colaIds, strAux, sizeof(STRING_LARGO_MAX));
+        printf("\n*%s*", strAux);
+        printf("\n*ptr: %s*", (*ParamAsigPtr).simbolo);
+          DecAsigMPtr = crearNodo("decAsigM", DecAsigMPtr, crearNodo("=", crearHoja(strAux), ParamAsigPtr));
+    } 
+    ;
+param_asig: 
+    ID  {printf("\t\t\tid es Param_asig\n");
+        if(!idDeclarado(&listaSimbolos, $1)){ 
+                printf("\nError, id: *%s* no fue declarado\n", $1);
+                return 1;
+        };
+        ParamAsigPtr = crearHoja($1);
+    }
+    | cte {printf("\t\t\t cte es Param_asig\n");
+        ParamAsigPtr = CtePtr;
+    }
+    ;
+/**/
+param_cont_mul:
+    param_asig  {printf("\t\t\tparam_asig es param_cont_mul\n");
+      
+    }
+    | param_cont_mul COMA param_asig {printf("\t\t\tparam_asig , param_asig es param_cont_mul\n");
+        
+    }
+    ; 
+
+
+cte: 
+    INT {printf("\t\t\t  int es Cte"); 
+        snprintf(strAux, sizeof($1), "%d", $1);
+        CtePtr = crearHoja(strAux);}
+    | FLOAT  {printf("\t\t\t  float es Cte");
+        snprintf(strAux, MIN(sizeof($1), VALOR_LARGO_MAX), "%.2f", $1);
+        CtePtr = crearHoja(strAux);
+    }
+    | STRING    {printf("\t\t\t  string es Cte");
+        CtePtr = crearHoja($1);
+    } 
+    ;
+
  
  //TODO: falta verificar que si tengo un id int, no se le asigne un float o string
  // en ID OP_AS string, no hay problema, en la regla expresion talvez haya que guardar un string con el tipo de la expresion(float, int) en un auxiliar y enviarselo 
@@ -319,7 +391,7 @@ int main(int argc, char *argv[]) {
     crearLista(&listaIds);
     crearPila(&anidaciones);
     crearPila(&condAnidados);
-
+    crearCola(&colaIds);
     if((yyin = fopen(argv[1], "rt"))==NULL) { 
         printf("\nNo se puede abrir el archivo de prueba: %s\n", argv[1]);
     }
@@ -336,6 +408,7 @@ int main(int argc, char *argv[]) {
     vaciarPila(&anidaciones);
     vaciarPila(&condAnidados);
     vaciarArbol(&compilado);
+    vaciarCola(&colaIds);
     return 0;
 }
  

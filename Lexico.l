@@ -51,11 +51,15 @@ READ        "read"
 CONCAT      "concatenarConRecorte"
 TIMER       "timer"
 ESTA_CONT   "estaContenido"
+ASIGCOMP    "AsigComp"
+CONT        "!cont"
 /* ID, TODO: Agregar guiones? */
 ID          {LETRA}({LETRA}|{DIGITO}|_)*
 /* Caracteres especiales */
 PA          "("
 PC		    ")"
+CA          "["
+CC          "]"
 LLA         "{"
 LLC         "}"
 COMA        ","
@@ -110,7 +114,8 @@ MENOR_IGUAL "<="
 {CONCAT}        {return CONCAT;}
 {TIMER}         {return TIMER;}
 {ESTA_CONT}     {return ESTA_CONT;}
-
+{ASIGCOMP}      {return ASIGCOMP;}
+{CONT}          {return CONT;}
 {ID}            {
                     if(fa_validarLongitudID(yytext) == TRUE){
                         insertarEnLista(&listaSimbolos, yytext, tID);
@@ -125,6 +130,8 @@ MENOR_IGUAL "<="
  
 {PA}            {return PA;}
 {PC}            {return PC;}
+{CA}            {return CA;}
+{CC}            {return CC;}
 {LLA}           {return LLA;}
 {LLC}           {return LLC;}
 {COMA}          {return COMA;}

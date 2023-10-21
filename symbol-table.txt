@@ -1,34 +1,6 @@
 nombre                                            |tipoDato|valor                                             |longitud  
-test5                                             |String |                                                  |0         
-test4                                             |String |                                                  |0         
-test2                                             |String |                                                  |0         
-test1                                             |String |                                                  |0         
-id_mas_largo_id_mas_id_mas_largo_id_mas_          |Int    |                                                  |0         
-float_min                                         |Float  |                                                  |0         
-float_max                                         |Float  |                                                  |0         
-entero_min                                        |Int    |                                                  |0         
-entero_max                                        |Int    |                                                  |0         
-cad_min                                           |String |                                                  |0         
-cad_max                                           |String |                                                  |0         
-cad_any                                           |String |                                                  |0         
+d                                                 |Int    |                                                  |0         
 c                                                 |Int    |                                                  |0         
 b                                                 |Int    |                                                  |0         
 a                                                 |Int    |                                                  |0         
-_test6                                            |String |test6                                             |5         
-_test3                                            |String |test3                                             |5         
-_teeeest                                          |String |teeeest                                           |7         
-_pepito                                           |String |pepito                                            |6         
-_pepe                                             |String |pepe                                              |4         
-_hola, mundo                                      |String |hola, mundo                                       |11        
-_hola                                             |String |hola                                              |4         
-_h                                                |String |h                                                 |1         
-_caad_anya                                        |String |caad_anya                                         |9         
-_abc                                              |String |abc                                               |3         
-_a                                                |String |a                                                 |1         
-_Cualquier cáracter: @!#'¿?                     |String |Cualquier cáracter: @!#'¿?                      |28        
-_5                                                |Int    |5                                                 |0         
-_32768                                            |Int    |32768                                             |0         
-_2147483648.                                      |Float  |2147483648.                                       |0         
-_2                                                |Int    |2                                                 |0         
-_0123456789012345678901234567890123456789         |String |0123456789012345678901234567890123456789          |40        
-_                                                 |String |                                                  |0         
+_1                                                |Int    |1                                                 |1         
