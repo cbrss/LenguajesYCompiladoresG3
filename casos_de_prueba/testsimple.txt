@@ -1,7 +1,0 @@
-init {
-    a,b,c,d : Int
- 
-}
-
-
-AsigComp([a] : [1])

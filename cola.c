@@ -49,6 +49,7 @@ int desencolar(Cola* pc, void* dato, size_t tamElem)
         pc->fondo = NULL;
 
     memcpy(dato, nae->dato, min(tamElem, nae->tamElem));
+
     free(nae->dato);
     free(nae);
 

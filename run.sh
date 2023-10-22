@@ -4,7 +4,7 @@
 flex lexico.l
 bison -dyv sintactico.y
 gcc lex.yy.c y.tab.c tab_simb.c arbol.c pila.c cola.c -o lyc-compiler-2.0.0.jar
-./lyc-compiler-2.0.0.jar "casos_de_prueba/testsimple.txt"
+./lyc-compiler-2.0.0.jar "casos_de_prueba/test.txt"
 rm lex.yy.c
 rm y.tab.c
 rm y.output

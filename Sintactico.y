@@ -26,11 +26,14 @@
     NodoA* CompiladoPtr, *ProgramaPtr, *DeclaPtr, *BloPtr, *DecPtr, *ListPtr, *SentPtr, *AsigPtr, *tipoAux,
             *CicPtr, *EvalPtr, *Eptr, *StrPtr, *ConPtr, *CmpPtr, *EptrAux, *BloAux, *Tptr, *Fptr, *CmpAux, *StrPtrAux;
     NodoA* EjePtr, * ConAux;
-    NodoA* DecAsigPTr,* DecAsigMPtr,* ParamAsigPtr,* CtePtr;
+    NodoA* DecAsigPTr,* DecAsigMPtr,* ParamAsigPtr,* CtePtr, * ParamContPtr;
 
 
     char  auxTipo[7], strAux[VALOR_LARGO_MAX + 1], strAux2[VALOR_LARGO_MAX + 1], cmpAux[3], opAux[3];
+    char strAuxAsig[VALOR_LARGO_MAX + 1];
     int intAux;
+    float floatAux;
+    int contador;
 %}
 
  
@@ -102,6 +105,7 @@ programa_prima:
 programa: 
     INIT LLA declaraciones LLC bloque_ejec  { printf("\tR2: init { declaraciones} bloque_ejec es Programa\n"); ProgramaPtr = crearNodo("Programa", DeclaPtr, BloPtr); } 
     |INIT LLA LLC bloque_ejec               { printf("\tR3: init { } bloque_ejec es Programa\n"); ProgramaPtr = BloPtr; }
+    | INIT LLA declaraciones LLC            { printf("\tRx8: init { declaraciones} es Programa\n"); ProgramaPtr = crearNodo("Programa", DeclaPtr, 0); } 
     ;
 
 declaraciones: 
@@ -122,11 +126,21 @@ dec:
 listado_ids:
     ID  { 
         printf("\t\tR7: id es Listado_ids\n");
+
+        if(idDeclarado(&listaSimbolos, $1)){ 
+            printf("\nError, id: *%s* ya fue declarado\n", $1);
+            return 1;
+        };
         insertarEnLista(&listaIds, $1, tID);
         ListPtr = crearHoja($1);
     }
     |listado_ids COMA ID    { 
         printf("\t\tR8: listado_ids , id es Listado_ids\n"); 
+        if(idDeclarado(&listaSimbolos, $3)){ 
+            printf("\nError, id: *%s* ya fue declarado\n", $3);
+            return 1;
+        };
+        
         insertarEnLista(&listaIds, $3, tID); 
         ListPtr = crearNodo(",", ListPtr, crearHoja($3));
     }
@@ -184,61 +198,82 @@ sentencia:
         SentPtr = DecAsigMPtr;
 
     }
-    |CONT PA expresion DOS_P DOS_P CA param_cont_mul CC PC {printf("\t\tRespecial2: !cont(expresion :: [param_cont_mul]) es Sentencia\n");}
     ;
+
 
 
 dec_asig_mul: 
-    ID {encolar(&colaIds, $1, sizeof($1));} CC DOS_P CA param_asig {
+    ID {encolar(&colaIds, $1, STRING_LARGO_MAX + 1);} CC DOS_P CA param_asig {
         printf("\t\t\tRx3: ] : [ es cierre de Dec_asig_mul\n");
-        desencolar(&colaIds, strAux, sizeof(STRING_LARGO_MAX));
-        printf("\n*%s*", strAux);
-        printf("\n*ptr: %s*", (*ParamAsigPtr).simbolo);
+
+        desencolar(&colaIds, strAux, STRING_LARGO_MAX + 1);
+        if(!idDeclarado(&listaSimbolos, strAux)){ 
+            printf("\nError, id: *%s* no fue declarado\n", $1);
+            return 1;
+        };
+        
+        if(!esMismoTipo(&listaSimbolos, strAux, strAuxAsig)){ 
+            printf("\nError, datos de diferente tipo.\n");
+            return 1;
+        }
         DecAsigMPtr = crearNodo("=", crearHoja(strAux), ParamAsigPtr);
       
         }
-    |ID COMA {encolar(&colaIds, $1, sizeof($1));} dec_asig_mul COMA param_asig {
+    |ID COMA {encolar(&colaIds, $1, STRING_LARGO_MAX + 1);} dec_asig_mul COMA param_asig {
         printf("\t\t\tRx2: , id dec_asig_mul param_asig , es Dec_asig_mul\n");
         /*tal vez rompe el sizeof*/
-        desencolar(&colaIds, strAux, sizeof(STRING_LARGO_MAX));
-        printf("\n*%s*", strAux);
-        printf("\n*ptr: %s*", (*ParamAsigPtr).simbolo);
-          DecAsigMPtr = crearNodo("decAsigM", DecAsigMPtr, crearNodo("=", crearHoja(strAux), ParamAsigPtr));
+        desencolar(&colaIds, strAux, STRING_LARGO_MAX + 1);
+        if(!idDeclarado(&listaSimbolos, strAux)){ 
+            printf("\nError, id: *%s* no fue declarado\n", $1);
+            return 1;
+        };
+    
+        if(!esMismoTipo(&listaSimbolos, strAux, strAuxAsig)){ 
+            printf("\nError, datos de diferente tipo.\n");
+            return 1;
+        }
+        DecAsigMPtr = crearNodo("decAsigM", DecAsigMPtr, crearNodo("=", crearHoja(strAux), ParamAsigPtr));
     } 
     ;
 param_asig: 
-    ID  {printf("\t\t\tid es Param_asig\n");
+    ID  {printf("\t\t\t  Rx3: id es Param_asig\n");
         if(!idDeclarado(&listaSimbolos, $1)){ 
                 printf("\nError, id: *%s* no fue declarado\n", $1);
                 return 1;
         };
         ParamAsigPtr = crearHoja($1);
     }
-    | cte {printf("\t\t\t cte es Param_asig\n");
+    | cte {printf("\t\t\t Rx4: cte es Param_asig\n");
         ParamAsigPtr = CtePtr;
     }
     ;
 /**/
+
 param_cont_mul:
-    param_asig  {printf("\t\t\tparam_asig es param_cont_mul\n");
-      
+    param_asig  {printf("\t\t\tRx6: param_asig es param_cont_mul\n");
+     
+        ParamContPtr = crearNodo("M", ParamContPtr, crearNodo("if", crearNodo("!=", Eptr, ParamAsigPtr), crearNodo("+", crearHoja("_i"), crearHoja("1"))));
     }
-    | param_cont_mul COMA param_asig {printf("\t\t\tparam_asig , param_asig es param_cont_mul\n");
-        
+    | param_cont_mul COMA param_asig {printf("\t\t\tRx6: param_asig , param_asig es param_cont_mul\n");
+        ParamContPtr = crearNodo("M", ParamContPtr, crearNodo("if", crearNodo("!=", Eptr, ParamAsigPtr), crearNodo("+", crearHoja("_i"), crearHoja("1"))));
     }
     ; 
 
-
 cte: 
-    INT {printf("\t\t\t  int es Cte"); 
+    INT {printf("\t\t\t  Rx4: int es Cte\n"); 
         snprintf(strAux, sizeof($1), "%d", $1);
-        CtePtr = crearHoja(strAux);}
-    | FLOAT  {printf("\t\t\t  float es Cte");
+        CtePtr = crearHoja(strAux);
+        strcpy(strAuxAsig, "Int");
+    }
+    | FLOAT  {printf("\t\t\t  Rx5: float es Cte\n");
         snprintf(strAux, MIN(sizeof($1), VALOR_LARGO_MAX), "%.2f", $1);
         CtePtr = crearHoja(strAux);
+        strcpy(strAuxAsig, "Float");
     }
-    | STRING    {printf("\t\t\t  string es Cte");
+    | STRING    {printf("\t\t\t  Rx6: string es Cte\n");
         CtePtr = crearHoja($1);
+        strcpy(strAuxAsig, "String");
+        
     } 
     ;
 
@@ -346,6 +381,10 @@ expresion:
     termino                     { printf("\t\t\t\tR42: Termino es Expresion\n"); Eptr = Tptr; }
     |expresion OP_SUM termino   { printf("\t\t\t\tR43: Expresion+Termino es Expresion\n"); Eptr = crearNodo("+", Eptr, Tptr); }
     |expresion OP_RES termino   { printf("\t\t\t\tR44: Expresion-Termino es Expresion\n"); Eptr = crearNodo("-", Eptr, Tptr); }
+    |CONT PA expresion DOS_P DOS_P CA param_cont_mul CC PC {
+        printf("\t\tRespecial2: !cont(expresion :: [param_cont_mul]) es Expresion\n");
+        Eptr = crearNodo("if",crearNodo("==",ParamContPtr, crearHoja("0")), crearNodo("=", crearHoja("_i"), crearHoja("-1")));
+    }
     ;
  
 termino:

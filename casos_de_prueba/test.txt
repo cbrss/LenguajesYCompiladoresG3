@@ -6,6 +6,10 @@ init {
     cad_max: String
     cad_any: String
     cad_concat1, cad_concat2, cad_concat3 : String
+    compl1, compl2 : Int
+    compl3 : Float
+    compl4 : String
+    contar1, contar2, contar3 : Int
     id_mas_largo_id_mas_id_mas_largo_id_mas_: Int
  
 }
@@ -134,3 +138,12 @@ ciclo (a > b) {
         write("write < ciclo anidado")
     }
 }
+
+
+*- Asignacion compleja -*
+AsigComp([compl1, compl2, compl3, compl4] : [1, 2, 2.5, "pepe"])
+AsigComp([compl1] : [1])
+
+*- Contar distinto -*
+c = !cont(a+b+3/c :: [contar1,contar2,contar3,3,2,3])
+c = !cont(a+b+3/c :: [contar1])
