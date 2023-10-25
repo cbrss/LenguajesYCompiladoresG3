@@ -103,9 +103,9 @@ programa_prima:
                 ; compilado = ProgramaPtr; }
     ;
 programa: 
-    INIT LLA declaraciones LLC bloque_ejec  { printf("\tR2: init { declaraciones} bloque_ejec es Programa\n"); ProgramaPtr = crearNodo("Programa", DeclaPtr, BloPtr); } 
+    INIT LLA declaraciones LLC bloque_ejec  { printf("\tR2: init { declaraciones} bloque_ejec es Programa\n"); ProgramaPtr = crearNodo("Programa", BloPtr, DeclaPtr); } 
     |INIT LLA LLC bloque_ejec               { printf("\tR3: init { } bloque_ejec es Programa\n"); ProgramaPtr = BloPtr; }
-    | INIT LLA declaraciones LLC            { printf("\tRx8: init { declaraciones} es Programa\n"); ProgramaPtr = crearNodo("Programa", DeclaPtr, 0); } 
+    | INIT LLA declaraciones LLC            { printf("\tRx8: init { declaraciones} es Programa\n"); ProgramaPtr = crearNodo("Programa", 0, DeclaPtr); } 
     ;
 
 declaraciones: 
