@@ -40,14 +40,13 @@ void recorrerArbolInOrden(Arbol *pa, int nivel, FILE *arch)
 {
     if (!*pa)
         return;
-
-    recorrerArbolInOrden(&(*pa)->der, nivel + 1, arch);
-
+    recorrerArbolInOrden(&(*pa)->izq, nivel + 1, arch);
+   
     for (int i = 0; i < nivel; i++)
         fprintf(arch, "\t");
     fprintf(arch, "%s\n", &(*pa)->simbolo);
 
-    recorrerArbolInOrden(&(*pa)->izq, nivel + 1, arch);
+    recorrerArbolInOrden(&(*pa)->der, nivel + 1, arch);
 }
 
 void vaciarArbol(Arbol *pa)
