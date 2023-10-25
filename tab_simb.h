@@ -38,3 +38,5 @@ void asignarTipo(Lista *listaIds, char *auxTipo);
 void fusionarLista(Lista *lista1, Lista *lista2);
 int esMismoTipo(Lista *, char *, char *);
 char *obtenerTipo(Lista *, char *);
+int listaVacia(Lista *);
+int eliminarDeLista(Lista* lista, char* id);

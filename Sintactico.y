@@ -27,7 +27,8 @@
             *CicPtr, *EvalPtr, *Eptr, *StrPtr, *ConPtr, *CmpPtr, *EptrAux, *BloAux, *Tptr, *Fptr, *CmpAux, *StrPtrAux;
     NodoA* EjePtr, * ConAux;
     NodoA* DecAsigPTr,* DecAsigMPtr,* ParamAsigPtr,* CtePtr, * ParamContPtr;
-
+    char AuxDec[ID_LARGO_MAX + 1];
+    NodoA* AuxPtr;
 
     char  auxTipo[7], strAux[VALOR_LARGO_MAX + 1], strAux2[VALOR_LARGO_MAX + 1], cmpAux[3], opAux[3];
     char strAuxAsig[VALOR_LARGO_MAX + 1];
@@ -118,8 +119,19 @@ dec:
         printf("\t\tR6: listado_ids : tipo es Dec\n");
         asignarTipo(&listaIds, auxTipo);
         fusionarLista(&listaSimbolos, &listaIds);
-        vaciarLista(&listaIds);
-        DecPtr = crearNodo(":", ListPtr, crearHoja(auxTipo));
+     
+        eliminarDeLista(&listaIds, AuxDec);
+        DecPtr = crearNodo(":", crearHoja(AuxDec), crearHoja(auxTipo));
+       
+        while(!listaVacia(&listaIds)){
+            eliminarDeLista(&listaIds, AuxDec);
+            AuxPtr = DecPtr;
+            DecPtr = crearNodo(":", crearHoja(AuxDec), crearHoja(auxTipo));
+            DecPtr = crearNodo("MDec", DecPtr, AuxPtr);
+        }
+        //vaciarLista(&listaIds);
+        
+        
     }
     ;
 

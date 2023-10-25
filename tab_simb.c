@@ -183,3 +183,22 @@ char *obtenerTipo(Lista *lista, char *id)
     }
     return NULL;
 }
+
+int listaVacia(Lista* lista)
+{
+    return !*lista;
+}
+
+int eliminarDeLista(Lista* lista, char* id)
+{
+    if(!*lista)
+        return 0;
+    NodoL* nae = *lista;
+    *lista = nae->sig;
+     
+    strcpy(id, nae->simb.nombre);
+   
+    free(nae);
+
+    return 1;
+}
