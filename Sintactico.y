@@ -506,8 +506,8 @@ void generar_assembler(Arbol* arbol){
     NodoA* test = padreMasIzq(arbol);
 
     int contOp = 1;
-    char aux[STRING_LARGO_MAX], auxOp[STRING_LARGO_MAX];
-
+    char aux[STRING_LARGO_MAX], auxOp[STRING_LARGO_MAX], auxSimbolo[STRING_LARGO_MAX];
+    char auxTipo[STRING_LARGO_MAX];
     while(test!= NULL){
         printf("\n*%s*\n", test->simbolo);
 
@@ -517,11 +517,20 @@ void generar_assembler(Arbol* arbol){
         
         while(operacionAritmetica(test->simbolo) ){
             printf("\n*%s*\n", test->simbolo);
+            
             if(strcmp(test->simbolo, "=") == 0){
                 //buscar en TS que tipo es el elemento de la derecha
                 // si es INt entonces FLD $s\nFRNDINT y si es float, FLD %s
+
+                strcpy(auxSimbolo, test->izq->simbolo);
+
+                strcpy(auxTipo, obtenerTipo(&listaSimbolos, auxSimbolo));
+               
+                //auxSimbolo = obtenerTipo(&listaSimbolos, test->simbolo);
                 fprintf(arch, "FLD %s\n", test->der->simbolo);
-                fprintf(arch, "FRNDINT\n");
+                if(strcmp(auxTipo, "Int") == 0){
+                    fprintf(arch, "FRNDINT\n");
+                }
 
                 //cada uno de los if de operaciones actualizar test->simbolo con el @aux
                 fprintf(arch, "FSTP %s\n", test->izq->simbolo);
@@ -587,9 +596,6 @@ void generar_assembler(Arbol* arbol){
             
         }
         contOp = 0;
-
-
-
 
         if(test != NULL){
             borrarHijos(test);

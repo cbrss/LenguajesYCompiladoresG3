@@ -15,5 +15,4 @@ FLD @aux3
 FSUB
 FSTP @aux4
 FLD @aux4
-FRNDINT
 FSTP z
