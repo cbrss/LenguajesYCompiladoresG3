@@ -59,3 +59,39 @@ void vaciarArbol(Arbol *pa)
     free(*pa);
     *pa = NULL;
 }
+
+
+NodoA *padreMasIzq(Arbol *pa) {
+    if (!*pa)
+        return NULL;
+
+    NodoA *res = padreMasIzq(&(*pa)->izq);
+    if (res)
+        return res;
+    res = padreMasIzq(&(*pa)->der);
+    if (res)
+        return res;
+
+
+    if ((*pa)->izq && (*pa)->der){
+        return *pa;
+    }
+        
+
+    return NULL;
+}
+void borrarHijos(NodoA* pa){
+    if(!pa){
+        return;
+    }
+    if (pa->izq)
+	{
+		free(pa->izq);
+		pa->izq = NULL;
+	}
+	if (pa->der)
+	{
+		free(pa->der);
+		pa->der = NULL;
+	}
+}

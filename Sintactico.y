@@ -14,6 +14,8 @@
 
     char* concatenar(char*, char*, int);
     int estaContenido(char*, char*);
+    void generar_assembler(Arbol* arbol);
+    int operacionAritmetica(char* op);
 
     Arbol compilado;
     Lista listaSimbolos;
@@ -95,13 +97,17 @@
  
 %%
 programa_prima: 
-    programa    { if(boolCompiladoOK == 1){
+    programa    { compilado = ProgramaPtr;
+                 if(boolCompiladoOK == 1){
                     printf("R1: COMPILACION EXITOSA\n");
+                    imprimirArbol(&compilado);
+                
+                    generar_assembler(&compilado);
                 }
                 else{
                     printf("R1: ERROR DE COMPILACION\n");
                 }
-                ; compilado = ProgramaPtr; }
+                ;  }
     ;
 programa: 
     INIT LLA declaraciones LLC bloque_ejec  { printf("\tR2: init { declaraciones} bloque_ejec es Programa\n"); ProgramaPtr = crearNodo("Programa", BloPtr, DeclaPtr); } 
@@ -305,6 +311,7 @@ asignacion:
             return 1;
         }
         AsigPtr = crearNodo("=", crearHoja($1), Eptr);
+    
     }
     |ID OP_AS string  { 
         printf("\t\tR22: ID = String es ASIGNACION\n"); 
@@ -422,13 +429,13 @@ factor:
     }
     |INT   { 
         printf("\t\t\t\t    R51: INT es Factor\n"); 
-        snprintf(strAux, sizeof($1), "%d", $1);
+        snprintf(strAux, sizeof($1), "_%d", $1);
         strcpy(auxTipo, TINT);
         Fptr= crearHoja(strAux); 
     }
     |FLOAT { 
         printf("\t\t\t\t    R52: FLOAT es Factor\n"); 
-        snprintf(strAux, MIN(sizeof($1), VALOR_LARGO_MAX), "%.2f", $1);
+        snprintf(strAux, MIN(sizeof($1), VALOR_LARGO_MAX), "_%.2f", $1);
         strcpy(auxTipo, TFLOAT);
         Fptr= crearHoja(strAux);
     }
@@ -452,8 +459,9 @@ int main(int argc, char *argv[]) {
     fclose(yyin);
 
     imprimirLista(&listaSimbolos);
-    imprimirArbol(&compilado);
     
+    //test = padreMasIzq(&compilado);
+   
     vaciarLista(&listaSimbolos);
     vaciarLista(&listaIds);
     vaciarPila(&anidaciones);
@@ -491,4 +499,115 @@ char* concatenar(char* str1, char* str2, int n){
 
 int estaContenido(char* str1, char* str2){ 
     return strstr(str1,str2) != NULL;
+}
+
+void generar_assembler(Arbol* arbol){
+    FILE *arch = fopen("final.asm", "w");
+    NodoA* test = padreMasIzq(arbol);
+
+    int contOp = 1;
+    char aux[STRING_LARGO_MAX], auxOp[STRING_LARGO_MAX];
+
+    while(test!= NULL){
+        printf("\n*%s*\n", test->simbolo);
+
+        //Asignacion : posiblemente necesite un while que recorra operaciones aritmeticas
+        //talvez mejor guardar todas las operaciones aritmeticas en una cola y desencolar
+        //en cada uno de los test->izq/der->simbolo hay que preguntar si es ID
+        
+        while(operacionAritmetica(test->simbolo) ){
+            printf("\n*%s*\n", test->simbolo);
+            if(strcmp(test->simbolo, "=") == 0){
+                //buscar en TS que tipo es el elemento de la derecha
+                // si es INt entonces FLD $s\nFRNDINT y si es float, FLD %s
+                fprintf(arch, "FLD %s\n", test->der->simbolo);
+                fprintf(arch, "FRNDINT\n");
+
+                //cada uno de los if de operaciones actualizar test->simbolo con el @aux
+                fprintf(arch, "FSTP %s\n", test->izq->simbolo);
+            }
+
+            else if(strcmp(test->simbolo, "+") == 0){
+                fprintf(arch, "FLD %s\n", test->izq->simbolo);
+                fprintf(arch, "FLD %s\n", test->der->simbolo);
+                fprintf(arch, "FADD\n");
+
+                fprintf(arch, "FSTP @aux%d\n", contOp);
+
+                strcpy(aux, "@aux");
+                itoa(contOp, auxOp, 10);
+                strcat(aux, auxOp);
+
+                strcpy(test->simbolo, aux);
+            }
+            else if(strcmp(test->simbolo, "-") == 0){
+                fprintf(arch, "FLD %s\n", test->izq->simbolo);
+                fprintf(arch, "FLD %s\n", test->der->simbolo);
+                fprintf(arch, "FSUB\n");
+
+                fprintf(arch, "FSTP @aux%d\n", contOp);
+
+                strcpy(aux, "@aux");
+                itoa(contOp, auxOp, 10);
+                strcat(aux, auxOp);
+
+                strcpy(test->simbolo, aux);
+            }
+            else if(strcmp(test->simbolo, "*") == 0){
+                fprintf(arch, "FLD %s\n", test->izq->simbolo);
+                fprintf(arch, "FLD %s\n", test->der->simbolo);
+                fprintf(arch, "FMUL\n");
+
+                fprintf(arch, "FSTP @aux%d\n", contOp);
+
+                strcpy(aux, "@aux");
+                itoa(contOp, auxOp, 10);
+                strcat(aux, auxOp);
+
+                strcpy(test->simbolo, aux);
+            }
+            else if(strcmp(test->simbolo, "/") == 0){
+                fprintf(arch, "FLD %s\n", test->izq->simbolo);
+                fprintf(arch, "FLD %s\n", test->der->simbolo);
+                fprintf(arch, "FDIV\n");
+
+                fprintf(arch, "FSTP @aux%d\n", contOp);
+
+                strcpy(aux, "@aux");
+                itoa(contOp, auxOp, 10);
+                strcat(aux, auxOp);
+
+                strcpy(test->simbolo, aux);
+                
+            }
+           
+            contOp++;
+            borrarHijos(test);
+            test = padreMasIzq(arbol);
+            
+        }
+        contOp = 0;
+
+
+
+
+        if(test != NULL){
+            borrarHijos(test);
+            test = padreMasIzq(arbol);
+        }
+    }
+
+    fclose(arch);
+
+}
+
+int operacionAritmetica(char* op){
+    if(strcmp(op, "+") == 0 ||
+        strcmp(op, "-") == 0 ||
+        strcmp(op, "*") == 0 ||
+        strcmp(op, "/") == 0 ||
+        strcmp(op, "=") == 0)   //TODO: posiblemente hay que sacarlo por si la asignacion es string
+        return 1;
+    
+    return 0;
 }

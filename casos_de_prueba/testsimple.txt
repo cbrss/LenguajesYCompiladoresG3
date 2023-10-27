@@ -1,0 +1,7 @@
+init {
+    z, a, b, c, d: Int
+ 
+}
+
+
+z = a + b * c - d / 20
