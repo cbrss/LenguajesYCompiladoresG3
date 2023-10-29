@@ -1,18 +1,15 @@
 FLD b
-FLD c
-FMUL
+FLD _2
+FADD
 FSTP @aux1
-FLD a
 FLD @aux1
+FLD _2
 FADD
 FSTP @aux2
-FLD d
-FLD _20
-FDIV
-FSTP @aux3
-FLD @aux2
-FLD @aux3
-FSUB
-FSTP @aux4
-FLD @aux4
-FSTP z
+fld a
+fcomp @aux2
+fstsw ax
+sahf
+FLD _2
+FRNDINT
+FSTP a

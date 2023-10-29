@@ -15,8 +15,11 @@
     char* concatenar(char*, char*, int);
     int estaContenido(char*, char*);
     void generar_assembler(Arbol* arbol);
-    int operacionAritmetica(char* op);
 
+    int esOperacionAritmetica(char* op);
+    int esOperadorLogico(char* op);
+    int esComparador(char* op);
+    
     Arbol compilado;
     Lista listaSimbolos;
     Lista listaIds;
@@ -504,39 +507,45 @@ int estaContenido(char* str1, char* str2){
 void generar_assembler(Arbol* arbol){
     FILE *arch = fopen("final.asm", "w");
     NodoA* test = padreMasIzq(arbol);
+    NodoA* condicion;
+    NodoA* bloque;
+
+    Cola estrucIf;
+    crearCola(&estrucIf);
+
 
     int contOp = 1;
-    char aux[STRING_LARGO_MAX], auxOp[STRING_LARGO_MAX], auxSimbolo[STRING_LARGO_MAX];
-    char auxTipo[STRING_LARGO_MAX];
+    char aux[STRING_LARGO_MAX + 1], auxOp[STRING_LARGO_MAX + 1], auxSimbolo[STRING_LARGO_MAX + 1];
+    char auxTipo[STRING_LARGO_MAX + 1], auxIf[ID_LARGO_MAX+ 1];
+    int contIf = 0; //si es 1 entonces tengo doble condicion
+
     while(test!= NULL){
-        printf("\n*%s*\n", test->simbolo);
+        //printf("\n*%s*\n", test->simbolo);
 
         //Asignacion : posiblemente necesite un while que recorra operaciones aritmeticas
         //talvez mejor guardar todas las operaciones aritmeticas en una cola y desencolar
         //en cada uno de los test->izq/der->simbolo hay que preguntar si es ID
-        
-        while(operacionAritmetica(test->simbolo) ){
-            printf("\n*%s*\n", test->simbolo);
+        if(strcmp(test->simbolo, "=") == 0){
+            //buscar en TS que tipo es el elemento de la derecha
+            // si es INt entonces FLD $s\nFRNDINT y si es float, FLD %s
+
+     
+            strcpy(auxTipo, obtenerTipo(&listaSimbolos, test->izq->simbolo));
             
-            if(strcmp(test->simbolo, "=") == 0){
-                //buscar en TS que tipo es el elemento de la derecha
-                // si es INt entonces FLD $s\nFRNDINT y si es float, FLD %s
-
-                strcpy(auxSimbolo, test->izq->simbolo);
-
-                strcpy(auxTipo, obtenerTipo(&listaSimbolos, auxSimbolo));
-               
-                //auxSimbolo = obtenerTipo(&listaSimbolos, test->simbolo);
-                fprintf(arch, "FLD %s\n", test->der->simbolo);
-                if(strcmp(auxTipo, "Int") == 0){
-                    fprintf(arch, "FRNDINT\n");
-                }
-
-                //cada uno de los if de operaciones actualizar test->simbolo con el @aux
-                fprintf(arch, "FSTP %s\n", test->izq->simbolo);
+            //auxSimbolo = obtenerTipo(&listaSimbolos, test->simbolo);
+            fprintf(arch, "FLD %s\n", test->der->simbolo);
+            if(strcmp(auxTipo, "Int") == 0){
+                fprintf(arch, "FRNDINT\n");
             }
 
-            else if(strcmp(test->simbolo, "+") == 0){
+            //cada uno de los if de operaciones actualizar test->simbolo con el @aux
+            fprintf(arch, "FSTP %s\n", test->izq->simbolo);
+            //posiblemente borrar hijos
+            contOp = 1;
+        }
+        if(esOperacionAritmetica(test->simbolo)  == 1){
+
+            if(strcmp(test->simbolo, "+") == 0){
                 fprintf(arch, "FLD %s\n", test->izq->simbolo);
                 fprintf(arch, "FLD %s\n", test->der->simbolo);
                 fprintf(arch, "FADD\n");
@@ -591,29 +600,70 @@ void generar_assembler(Arbol* arbol){
             }
            
             contOp++;
-            borrarHijos(test);
-            test = padreMasIzq(arbol);
-            
         }
-        contOp = 0;
 
-        if(test != NULL){
-            borrarHijos(test);
-            test = padreMasIzq(arbol);
+       
+        if(strcmp(test->simbolo, "if") == 0){
+           
+           while(!colaVacia(&estrucIf)){
+                desencolar(&estrucIf, auxIf, sizeof(ID_LARGO_MAX + 1));
+                printf("\n*dentro:*%s*\n", auxIf);
+                
+                //fprintf(arch, "fld %s\n", auxIf);
+           }
+           printf("\n*estruc:%s*\n", test->der->simbolo);
         }
+        if(esComparador(test->simbolo) == 1){
+            
+            encolar(&estrucIf, test->izq->simbolo, strlen(test->izq->simbolo) + 1);
+            encolar(&estrucIf, test->der->simbolo, strlen(test->der->simbolo) + 1);
+            encolar(&estrucIf, test->simbolo, strlen(test->simbolo) + 1);
+
+            fprintf(arch, "fld %s\n", test->izq->simbolo);
+            fprintf(arch, "fcomp %s\n", test->der->simbolo);
+
+            contIf++;
+            fprintf(arch, "fstsw ax\n");    //los flags del coprocesador en memoria
+            fprintf(arch, "sahf\n");        //guardo los flags que estan en memoria en el registro FLAG del cpu
+        }
+        if(esOperadorLogico(test->simbolo) == 1){
+            encolar(&estrucIf, test->simbolo, sizeof(ID_LARGO_MAX + 1));
+        }
+ 
+        borrarHijos(test);
+        test = padreMasIzq(arbol);
+
     }
 
     fclose(arch);
 
 }
 
-int operacionAritmetica(char* op){
+int esOperacionAritmetica(char* op){
     if(strcmp(op, "+") == 0 ||
         strcmp(op, "-") == 0 ||
         strcmp(op, "*") == 0 ||
-        strcmp(op, "/") == 0 ||
-        strcmp(op, "=") == 0)   //TODO: posiblemente hay que sacarlo por si la asignacion es string
+        strcmp(op, "/") == 0)  
         return 1;
     
+    return 0;
+}
+int esOperadorLogico(char* op){
+    if(strcmp(op, "&") == 0 ||
+        strcmp(op, "||") == 0)
+        return 1;
+
+    return 0;
+}
+
+int esComparador(char* op){
+    if(strcmp(op, "<") == 0 ||
+        strcmp(op, "<=") == 0 ||
+        strcmp(op, ">") == 0 ||
+        strcmp(op, ">=") == 0 ||
+        strcmp(op, "==") == 0 ||
+        strcmp(op, "!=") == 0 )
+        return 1;
+
     return 0;
 }
