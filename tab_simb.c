@@ -202,3 +202,22 @@ int eliminarDeLista(Lista* lista, char* id)
 
     return 1;
 }
+
+void imprimirEncabezado(Lista* lista){
+    FILE *arch = fopen("final.asm", "w");
+    if (arch == NULL)
+    {
+        printf("Error al abrir el archivo\n");
+        return;
+    }
+  
+    fprintf(arch, ".MODEL LARGE\n.386\n.STACK 200h\n.DATA\n\n");
+    while (*lista != NULL)
+    {
+        fprintf(arch, "%s dd %s\n", (*lista)->simb.nombre, (*lista)->simb.valor);
+        lista = &(*lista)->sig;
+    }
+    fprintf(arch, "\n");
+    fclose(arch);
+
+}

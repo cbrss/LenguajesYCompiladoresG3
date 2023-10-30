@@ -19,7 +19,8 @@
     int esOperacionAritmetica(char* op);
     int esOperadorLogico(char* op);
     int esComparador(char* op);
-    
+    void generarEncabezado(Lista* listaSimbolos, FILE* arch);
+
     Arbol compilado;
     Lista listaSimbolos;
     Lista listaIds;
@@ -313,6 +314,7 @@ asignacion:
             printf("\nError, datos de diferente tipo.\n");
             return 1;
         }
+        
         AsigPtr = crearNodo("=", crearHoja($1), Eptr);
     
     }
@@ -354,13 +356,13 @@ eval:
     IF PA condicion PC LLA bloque_ejec LLC { 
         printf("\t\tR26: if (condicion) { bloque_ejec} es Eval\n"); 
         desapilar(&condAnidados, &ConAux, sizeof(ConAux));
-        EvalPtr = crearNodo("if", ConAux, BloPtr);
+        EvalPtr = crearNodo("if", ConAux, crearNodo("then",BloPtr, crearHoja("TEST")));
     }
     |IF PA condicion PC LLA bloque_ejec LLC{ apilar(&anidaciones, &BloPtr, sizeof(BloPtr)); } ELSE LLA bloque_ejec LLC { 
         printf("\t\tR27: if (condicion) { bloque_ejec} else { bloque_ejec} es Eval\n"); 
         desapilar(&condAnidados, &ConAux, sizeof(ConAux));
         desapilar(&anidaciones, &BloAux, sizeof(BloAux));   //el apilar de blo_ejec no funciona aca por que el else ejecuta otra instancia de bloque_Ejec
-        EvalPtr = crearNodo("if", ConAux, crearNodo("Cuerpo", BloAux, BloPtr));
+        EvalPtr = crearNodo("if", ConAux, crearNodo("Cuerpo", crearNodo("then",BloAux,crearHoja("TEST")), crearNodo("else",BloPtr, crearHoja("TEST"))));
     }
     ;
 
@@ -463,7 +465,7 @@ int main(int argc, char *argv[]) {
 
     imprimirLista(&listaSimbolos);
     
-    //test = padreMasIzq(&compilado);
+    //padre = padreMasIzq(&compilado);
    
     vaciarLista(&listaSimbolos);
     vaciarLista(&listaIds);
@@ -505,49 +507,47 @@ int estaContenido(char* str1, char* str2){
 }
 
 void generar_assembler(Arbol* arbol){
-    FILE *arch = fopen("final.asm", "w");
-    NodoA* test = padreMasIzq(arbol);
+    imprimirEncabezado(&listaSimbolos );
+    FILE *arch = fopen("final.asm", "a");
+    NodoA* padre = padreMasIzq(arbol);
     NodoA* condicion;
     NodoA* bloque;
 
     Cola estrucIf;
     crearCola(&estrucIf);
 
-
     int contOp = 1;
     char aux[STRING_LARGO_MAX + 1], auxOp[STRING_LARGO_MAX + 1], auxSimbolo[STRING_LARGO_MAX + 1];
     char auxTipo[STRING_LARGO_MAX + 1], auxIf[ID_LARGO_MAX+ 1];
-    int contIf = 0; //si es 1 entonces tengo doble condicion
+    int existeElse = 0; //si es 1 entonces tengo doble condicion
+    int contFalso = 0; //
+    int contVerdadero = 0;
+    char etiquetaFalso[100]; //apilar etiquetas true y false
+    char etiquetaVerdadero[100];
+    char nro[100];
+    while(padre!= NULL){
+        printf("\n*%s*\n", padre->simbolo);
 
-    while(test!= NULL){
-        //printf("\n*%s*\n", test->simbolo);
+        if(strcmp(padre->simbolo, "=") == 0){
 
-        //Asignacion : posiblemente necesite un while que recorra operaciones aritmeticas
-        //talvez mejor guardar todas las operaciones aritmeticas en una cola y desencolar
-        //en cada uno de los test->izq/der->simbolo hay que preguntar si es ID
-        if(strcmp(test->simbolo, "=") == 0){
-            //buscar en TS que tipo es el elemento de la derecha
-            // si es INt entonces FLD $s\nFRNDINT y si es float, FLD %s
+            strcpy(auxTipo, obtenerTipo(&listaSimbolos, padre->izq->simbolo));
 
-     
-            strcpy(auxTipo, obtenerTipo(&listaSimbolos, test->izq->simbolo));
-            
-            //auxSimbolo = obtenerTipo(&listaSimbolos, test->simbolo);
-            fprintf(arch, "FLD %s\n", test->der->simbolo);
+            fprintf(arch, "FLD %s\n", padre->der->simbolo);
             if(strcmp(auxTipo, "Int") == 0){
                 fprintf(arch, "FRNDINT\n");
             }
 
-            //cada uno de los if de operaciones actualizar test->simbolo con el @aux
-            fprintf(arch, "FSTP %s\n", test->izq->simbolo);
+            //cada uno de los if de operaciones actualizar padre->simbolo con el @aux
+            fprintf(arch, "FSTP %s\n", padre->izq->simbolo);
             //posiblemente borrar hijos
+
             contOp = 1;
         }
-        if(esOperacionAritmetica(test->simbolo)  == 1){
-
-            if(strcmp(test->simbolo, "+") == 0){
-                fprintf(arch, "FLD %s\n", test->izq->simbolo);
-                fprintf(arch, "FLD %s\n", test->der->simbolo);
+        if(esOperacionAritmetica(padre->simbolo)  == 1){
+            
+            if(strcmp(padre->simbolo, "+") == 0){
+                fprintf(arch, "FLD %s\n", padre->izq->simbolo);
+                fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FADD\n");
 
                 fprintf(arch, "FSTP @aux%d\n", contOp);
@@ -556,11 +556,11 @@ void generar_assembler(Arbol* arbol){
                 itoa(contOp, auxOp, 10);
                 strcat(aux, auxOp);
 
-                strcpy(test->simbolo, aux);
+                strcpy(padre->simbolo, aux);
             }
-            else if(strcmp(test->simbolo, "-") == 0){
-                fprintf(arch, "FLD %s\n", test->izq->simbolo);
-                fprintf(arch, "FLD %s\n", test->der->simbolo);
+            else if(strcmp(padre->simbolo, "-") == 0){
+                fprintf(arch, "FLD %s\n", padre->izq->simbolo);
+                fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FSUB\n");
 
                 fprintf(arch, "FSTP @aux%d\n", contOp);
@@ -569,11 +569,11 @@ void generar_assembler(Arbol* arbol){
                 itoa(contOp, auxOp, 10);
                 strcat(aux, auxOp);
 
-                strcpy(test->simbolo, aux);
+                strcpy(padre->simbolo, aux);
             }
-            else if(strcmp(test->simbolo, "*") == 0){
-                fprintf(arch, "FLD %s\n", test->izq->simbolo);
-                fprintf(arch, "FLD %s\n", test->der->simbolo);
+            else if(strcmp(padre->simbolo, "*") == 0){
+                fprintf(arch, "FLD %s\n", padre->izq->simbolo);
+                fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FMUL\n");
 
                 fprintf(arch, "FSTP @aux%d\n", contOp);
@@ -582,11 +582,11 @@ void generar_assembler(Arbol* arbol){
                 itoa(contOp, auxOp, 10);
                 strcat(aux, auxOp);
 
-                strcpy(test->simbolo, aux);
+                strcpy(padre->simbolo, aux);
             }
-            else if(strcmp(test->simbolo, "/") == 0){
-                fprintf(arch, "FLD %s\n", test->izq->simbolo);
-                fprintf(arch, "FLD %s\n", test->der->simbolo);
+            else if(strcmp(padre->simbolo, "/") == 0){
+                fprintf(arch, "FLD %s\n", padre->izq->simbolo);
+                fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FDIV\n");
 
                 fprintf(arch, "FSTP @aux%d\n", contOp);
@@ -595,44 +595,94 @@ void generar_assembler(Arbol* arbol){
                 itoa(contOp, auxOp, 10);
                 strcat(aux, auxOp);
 
-                strcpy(test->simbolo, aux);
+                strcpy(padre->simbolo, aux);
                 
             }
            
             contOp++;
-        }
-
-       
-        if(strcmp(test->simbolo, "if") == 0){
-           
-           while(!colaVacia(&estrucIf)){
-                desencolar(&estrucIf, auxIf, sizeof(ID_LARGO_MAX + 1));
-                printf("\n*dentro:*%s*\n", auxIf);
-                
-                //fprintf(arch, "fld %s\n", auxIf);
-           }
-           printf("\n*estruc:%s*\n", test->der->simbolo);
-        }
-        if(esComparador(test->simbolo) == 1){
             
-            encolar(&estrucIf, test->izq->simbolo, strlen(test->izq->simbolo) + 1);
-            encolar(&estrucIf, test->der->simbolo, strlen(test->der->simbolo) + 1);
-            encolar(&estrucIf, test->simbolo, strlen(test->simbolo) + 1);
+        }
 
-            fprintf(arch, "fld %s\n", test->izq->simbolo);
-            fprintf(arch, "fcomp %s\n", test->der->simbolo);
+        if(strcmp(padre->simbolo, "Cuerpo")){
+            //fprintf(arch, "%s", etiqueta);
+            //contFalso++;
+        }
+        if(strcmp(padre->simbolo, "if") == 0 ){
+           
+            //fprintf(arch, "%s\n", etiqueta);
+            contFalso++;
+            contVerdadero++;
+        }
+        if(strcmp(padre->simbolo, "then") == 0){
+            strcpy(etiquetaVerdadero, "verdadero");
+            itoa(contVerdadero, nro, 10);
+            strcat(etiquetaVerdadero, nro);
+            //TODO: anda mal, buscar forma de saber antes de leer el then que hay un else
+            if(existeElse == 1){
+                fprintf(arch, "BI %s\n", etiquetaVerdadero);
+                existeElse = 0;
+            }
+            
+            fprintf(arch, "%s\n", etiquetaFalso);
+        }
+        if(strcmp(padre->simbolo, "else") == 0){
+            fprintf(arch, "BI %s\n", etiquetaVerdadero);
+            existeElse=1;
+        }
+        if(esComparador(padre->simbolo) == 1){
+            
+            
+            fprintf(arch, "fld %s\n", padre->izq->simbolo);
+            fprintf(arch, "fcomp %s\n", padre->der->simbolo);
 
-            contIf++;
+            
             fprintf(arch, "fstsw ax\n");    //los flags del coprocesador en memoria
             fprintf(arch, "sahf\n");        //guardo los flags que estan en memoria en el registro FLAG del cpu
+            
+            strcpy(etiquetaFalso, "falso");
+            
+            if(strcmp(padre->simbolo, "<") == 0){
+                
+                itoa(contFalso, nro, 10);
+                strcat(etiquetaFalso, nro);
+                fprintf(arch, "JNB %s\n", etiquetaFalso);
+                
+            } else if (strcmp(padre->simbolo, ">") == 0){
+    
+                itoa(contFalso, nro, 10);
+                strcat(etiquetaFalso, nro);
+                fprintf(arch, "JBE %s\n", etiquetaFalso);
+            } else if (strcmp(padre->simbolo, "<=") == 0){
+      
+                itoa(contFalso, nro, 10);
+                strcat(etiquetaFalso, nro);
+                fprintf(arch, "JNBE %s\n", etiquetaFalso);
+            } else if (strcmp(padre->simbolo, ">=") == 0){
+             
+                itoa(contFalso, nro, 10);
+                strcat(etiquetaFalso, nro);
+                fprintf(arch, "JNAE %s\n", etiquetaFalso);
+            } else if (strcmp(padre->simbolo, "!=") == 0){
+
+                itoa(contFalso, nro, 10);
+                strcat(etiquetaFalso, nro);
+                fprintf(arch, "JE %s\n", etiquetaFalso);
+            } else if (strcmp(padre->simbolo, "==") == 0){
+
+                itoa(contFalso, nro, 10);
+                strcat(etiquetaFalso, nro);
+                fprintf(arch, "JNE %s\n", etiquetaFalso);
+            }
+            
+           
         }
-        if(esOperadorLogico(test->simbolo) == 1){
-            encolar(&estrucIf, test->simbolo, sizeof(ID_LARGO_MAX + 1));
+        if(esOperadorLogico(padre->simbolo) == 1){
+            
+            encolar(&estrucIf, padre->simbolo, ID_LARGO_MAX + 1);
         }
  
-        borrarHijos(test);
-        test = padreMasIzq(arbol);
-
+        borrarHijos(padre);
+        padre = padreMasIzq(arbol);
     }
 
     fclose(arch);
@@ -667,3 +717,4 @@ int esComparador(char* op){
 
     return 0;
 }
+

@@ -40,3 +40,4 @@ int esMismoTipo(Lista *, char *, char *);
 char *obtenerTipo(Lista *, char *);
 int listaVacia(Lista *);
 int eliminarDeLista(Lista* lista, char* id);
+void imprimirEncabezado(Lista* lista);
