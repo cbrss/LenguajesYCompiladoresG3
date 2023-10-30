@@ -5,6 +5,4 @@ init {
 
 if (a > b & a < b){
     a = 2
-} else{
-    b = 3
 }

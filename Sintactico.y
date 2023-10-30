@@ -356,13 +356,13 @@ eval:
     IF PA condicion PC LLA bloque_ejec LLC { 
         printf("\t\tR26: if (condicion) { bloque_ejec} es Eval\n"); 
         desapilar(&condAnidados, &ConAux, sizeof(ConAux));
-        EvalPtr = crearNodo("if", ConAux, crearNodo("then",BloPtr, crearHoja("TEST")));
+        EvalPtr = crearNodo("if", ConAux, crearNodo("then",BloPtr, crearHoja("noExisteElse")));
     }
     |IF PA condicion PC LLA bloque_ejec LLC{ apilar(&anidaciones, &BloPtr, sizeof(BloPtr)); } ELSE LLA bloque_ejec LLC { 
         printf("\t\tR27: if (condicion) { bloque_ejec} else { bloque_ejec} es Eval\n"); 
         desapilar(&condAnidados, &ConAux, sizeof(ConAux));
         desapilar(&anidaciones, &BloAux, sizeof(BloAux));   //el apilar de blo_ejec no funciona aca por que el else ejecuta otra instancia de bloque_Ejec
-        EvalPtr = crearNodo("if", ConAux, crearNodo("Cuerpo", crearNodo("then",BloAux,crearHoja("TEST")), crearNodo("else",BloPtr, crearHoja("TEST"))));
+        EvalPtr = crearNodo("if", ConAux, crearNodo("Cuerpo", crearNodo("then",BloAux,crearHoja("existeElse")), crearNodo("else",BloPtr, crearHoja("existeElse"))));
     }
     ;
 
@@ -618,7 +618,7 @@ void generar_assembler(Arbol* arbol){
             itoa(contVerdadero, nro, 10);
             strcat(etiquetaVerdadero, nro);
             //TODO: anda mal, buscar forma de saber antes de leer el then que hay un else
-            if(existeElse == 1){
+            if(strcmp(padre->der->simbolo, "existeElse") == 0){
                 fprintf(arch, "BI %s\n", etiquetaVerdadero);
                 existeElse = 0;
             }

@@ -8,7 +8,6 @@ d dd
 c dd 
 b dd 
 a dd 
-_3 dd 3
 _2 dd 2
 
 fld a
@@ -25,7 +24,3 @@ FLD _2
 FRNDINT
 FSTP a
 falso0
-FLD _3
-FRNDINT
-FSTP b
-BI verdadero0
