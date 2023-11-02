@@ -48,6 +48,17 @@ void recorrerArbolInOrden(Arbol *pa, int nivel, FILE *arch)
 
     recorrerArbolInOrden(&(*pa)->der, nivel + 1, arch);
 }
+void recorrerArbolInOrdenOUT(Arbol *pa)
+{
+    if (!*pa)
+        return;
+    recorrerArbolInOrdenOUT(&(*pa)->izq);
+   
+   
+    printf("%s\n", &(*pa)->simbolo);
+
+    recorrerArbolInOrdenOUT(&(*pa)->der);
+}
 
 void vaciarArbol(Arbol *pa)
 {
@@ -68,18 +79,22 @@ NodoA *padreMasIzq(Arbol *pa) {
     NodoA *res = padreMasIzq(&(*pa)->izq);
     if (res)
         return res;
+    
+    if ((*pa)->izq  && (*pa)->der){
+        return *pa;
+    }
     res = padreMasIzq(&(*pa)->der);
     if (res)
         return res;
 
-
-    if ((*pa)->izq && (*pa)->der){
-        return *pa;
-    }
-        
-
     return NULL;
 }
+
+int esHoja(NodoA* nodo)
+{
+    return !nodo->izq && !nodo->der;
+}
+
 void borrarHijos(NodoA* pa){
     if(!pa){
         return;

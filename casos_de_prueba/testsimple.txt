@@ -3,6 +3,10 @@ init {
  
 }
 
-if (a > b & a < b){
-    a = 2
-}
+if (a < b){
+    if(d < c){
+        a=2
+    } else{
+        a=3
+    }
+} 

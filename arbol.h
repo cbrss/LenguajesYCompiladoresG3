@@ -17,6 +17,8 @@ NodoA *crearNodo(char *simb, NodoA *hIzq, NodoA *hDer);
 NodoA *crearHoja(char *simb);
 void imprimirArbol(Arbol *pa);
 void recorrerArbolInOrden(Arbol *pa, int nivel, FILE *fp);
+void recorrerArbolInOrdenOUT(Arbol *pa);
 void vaciarArbol(Arbol *pa);
 NodoA *padreMasIzq(Arbol *pa);
+int esHoja(NodoA* pa);
 void borrarHijos(NodoA* pa);
