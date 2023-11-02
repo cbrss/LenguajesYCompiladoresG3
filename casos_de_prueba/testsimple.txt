@@ -4,9 +4,8 @@ init {
 }
 
 if (a < b){
-    if(d < c){
-        a=2
-    } else{
-        a=3
+    write("a")
+    if(b < d){
+        write("b")
     }
-} 
+}

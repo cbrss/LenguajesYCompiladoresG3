@@ -616,38 +616,38 @@ void generar_assembler(Arbol* arbol, FILE* arch){
             
         }
        
+        if(strcmp(padre->simbolo, "Write") == 0){
+            fprintf(arch, "dato: %s\n", padre->izq->simbolo);
+        }
 
         if(strcmp(padre->simbolo, "if") == 0 ){
 
             if(strcmp(padre->der->simbolo, "Cuerpo") == 0){
+                
+                
+                generar_assembler(&padre->der->izq, arch);  //true
                 strcpy(etiquetaVerdadero, "verdadero");
                 itoa(contVerdadero, nro, 10);
                 strcat(etiquetaVerdadero, nro);
-
-                
-
-                desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
-                //printf("\ndesapilando: *%s*\n", etiquetaFalso);
-                generar_assembler(&padre->der->izq, arch);  //true
-                apilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
                 contVerdadero++;
-                printf("\napilando: *%s*\n", etiquetaVerdadero);
+                apilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
                 
+           
                 fprintf(arch, "BI %s\n", etiquetaVerdadero);
-                
-                fprintf(arch, "%s\n", etiquetaFalso);   //fin
+                desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
+
+                fprintf(arch, "%s\n", etiquetaFalso);  
                 
                 generar_assembler(&padre->der->der, arch);  //false
                 desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
-                printf("\ndesapilando: *%s*\n", etiquetaVerdadero);
-                fprintf(arch, "%s\n", etiquetaVerdadero);   //fin
+                fprintf(arch, "%s\n", etiquetaVerdadero);  
                 
                 
                 
             } else{
                 generar_assembler(&padre->der, arch);
                 desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
-
+                
                 fprintf(arch, "%s\n", etiquetaFalso);
                // contFalso++;
             }
@@ -702,6 +702,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
             }
 
             apilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
+   
 
             contFalso++;
         }

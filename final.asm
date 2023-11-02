@@ -8,26 +8,20 @@ d dd
 c dd 
 b dd 
 a dd 
-_3 dd 3
-_2 dd 2
+_b dd b
+_a dd a
 
 fld a
 fcomp b
 fstsw ax
 sahf
 JNB falso0
-fld d
-fcomp c
+dato: "a"
+fld b
+fcomp d
 fstsw ax
 sahf
 JNB falso1
-FLD a
-FRNDINT
-FSTP _2
-BI verdadero0
+dato: "b"
 falso1
-FLD a
-FRNDINT
-FSTP _3
-verdadero0
 falso0
