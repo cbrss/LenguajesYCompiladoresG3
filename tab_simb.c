@@ -1,4 +1,5 @@
 #include "tab_simb.h"
+void sacarEspacios(char *str);
 
 Lista crearLista(Lista *pl)
 {
@@ -49,6 +50,8 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
         strcpy(nuevo_simbolo.tipo_dato, TSTRING);
         strcpy(nuevo_simbolo.valor, nNombre);
         nuevo_simbolo.longitud = longitud;
+
+        sacarEspacios(nuevo_simbolo.nombre);
     }
 
     while ((*lista != NULL) && strcmp((*lista)->simb.nombre, nuevo_simbolo.nombre) > 0 )
@@ -74,6 +77,12 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
     memcpy(&(nuevo->simb), &nuevo_simbolo, sizeof(Simbolo));
     nuevo->sig = *lista;
     *lista = nuevo;
+}
+void sacarEspacios(char *str) {
+    for(int i = 0; str[i]; i++){
+        if(str[i] == ' ')
+            str[i] = '_';
+    }
 }
 
 void imprimirLista(Lista *lista)
@@ -203,7 +212,7 @@ int eliminarDeLista(Lista* lista, char* id)
     return 1;
 }
 
-void imprimirEncabezado(Lista* lista){
+void imprimirEncabezado(Lista* lista, int cantAux){
     FILE *arch = fopen("final.asm", "w");
     if (arch == NULL)
     {
@@ -214,9 +223,29 @@ void imprimirEncabezado(Lista* lista){
     fprintf(arch, ".MODEL LARGE\n.386\n.STACK 200h\n.DATA\n\n");
     while (*lista != NULL)
     {
-        fprintf(arch, "%s dd %s\n", (*lista)->simb.nombre, (*lista)->simb.valor);
+        if (strlen((*lista)->simb.valor) == 0){     // si es ID
+            fprintf(arch, "%s dd ??\n", (*lista)->simb.nombre);
+
+        } else if(strcmp((*lista)->simb.tipo_dato, "Int") == 0 ){
+            fprintf(arch, "%s dd %s.0\n", (*lista)->simb.nombre, (*lista)->simb.valor);
+        } else if (strcmp((*lista)->simb.tipo_dato, "Float") == 0){
+            fprintf(arch, "%s dd %s\n", (*lista)->simb.nombre, (*lista)->simb.valor);   //si es float
+        } else{
+            fprintf(arch, "%s db \"%s\" , '$', %d dup (?)\n", (*lista)->simb.nombre, (*lista)->simb.valor, (*lista)->simb.longitud);
+        }
+        //TODO: faltaria si es un string
+
         lista = &(*lista)->sig;
     }
+    int i = 1;
+    if(cantAux != -1){
+        while(cantAux != 0){
+            fprintf(arch, "@aux%d dd \n",i);
+            i++;
+            cantAux--;
+        }
+    }
+    
     fprintf(arch, "\n");
     fclose(arch);
 

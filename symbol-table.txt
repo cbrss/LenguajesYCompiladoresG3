@@ -1,10 +1,9 @@
 nombre                                            |tipoDato|valor                                             |longitud  
 z                                                 |Int    |                                                  |0         
+pepe                                              |String |                                                  |0         
 d                                                 |Int    |                                                  |0         
 c                                                 |Int    |                                                  |0         
 b                                                 |Int    |                                                  |0         
 a                                                 |Int    |                                                  |0         
-_a                                                |String |a                                                 |1         
-_4                                                |Int    |4                                                 |1         
-_3                                                |Int    |3                                                 |1         
+_2_+_42                                           |String |2 + 42                                            |6         
 _2                                                |Int    |2                                                 |1         

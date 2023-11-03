@@ -20,10 +20,9 @@
     int esOperacionAritmetica(char* op);
     int esOperadorLogico(char* op);
     int esComparador(char* op);
-    void generarEncabezado(Lista* listaSimbolos, FILE* arch);
     void procesarComparador(NodoA* padre);
     void procesarOpLogico(NodoA* padre);
-
+    void maximo();
     Arbol compilado;
     Lista listaSimbolos;
     Lista listaIds;
@@ -46,8 +45,8 @@
     int intAux;
     float floatAux;
     int contador;
-
-
+    int cantidadAuxiliares = 0;
+    int contadorAuxiliares = 0; 
 
     //assembler
     int contOp = 1;
@@ -122,8 +121,9 @@ programa_prima:
     programa    { compilado = ProgramaPtr;
                  if(boolCompiladoOK == 1){
                     printf("R1: COMPILACION EXITOSA\n");
+                    printf("\nCANTIDA AUX:%d", cantidadAuxiliares);
                     imprimirArbol(&compilado);
-                    imprimirEncabezado(&listaSimbolos );
+                    imprimirEncabezado(&listaSimbolos, cantidadAuxiliares - 1);
                     FILE *arch = fopen("final.asm", "a");
                     generar_assembler(&compilado, arch);
                     fclose(arch);
@@ -333,7 +333,8 @@ asignacion:
         }
         
         AsigPtr = crearNodo("=", crearHoja($1), Eptr);
-    
+        maximo();
+        contadorAuxiliares=0;
     }
     |ID OP_AS string  { 
         printf("\t\tR22: ID = String es ASIGNACION\n"); 
@@ -346,6 +347,8 @@ asignacion:
             return 1;
         }
         AsigPtr = crearNodo("=", crearHoja($1), StrPtr);
+        maximo();
+        contadorAuxiliares=0;
     }
     ;
 
@@ -419,12 +422,13 @@ comparador:
     ;
 
 expresion:
-    termino                     { printf("\t\t\t\tR42: Termino es Expresion\n"); Eptr = Tptr; }
-    |expresion OP_SUM termino   { printf("\t\t\t\tR43: Expresion+Termino es Expresion\n"); Eptr = crearNodo("+", Eptr, Tptr); }
-    |expresion OP_RES termino   { printf("\t\t\t\tR44: Expresion-Termino es Expresion\n"); Eptr = crearNodo("-", Eptr, Tptr); }
+    termino                     { printf("\t\t\t\tR42: Termino es Expresion\n"); Eptr = Tptr; contadorAuxiliares++;}
+    |expresion OP_SUM termino   { printf("\t\t\t\tR43: Expresion+Termino es Expresion\n"); Eptr = crearNodo("+", Eptr, Tptr); contadorAuxiliares++;}
+    |expresion OP_RES termino   { printf("\t\t\t\tR44: Expresion-Termino es Expresion\n"); Eptr = crearNodo("-", Eptr, Tptr); contadorAuxiliares++;}
     |CONT PA expresion DOS_P DOS_P CA param_cont_mul CC PC {
         printf("\t\tRespecial2: !cont(expresion :: [param_cont_mul]) es Expresion\n");
         Eptr = crearNodo("if",crearNodo("==",ParamContPtr, crearHoja("0")), crearNodo("=", crearHoja("_i"), crearHoja("-1")));
+        contadorAuxiliares++;
     }
     ;
  
@@ -529,7 +533,7 @@ int estaContenido(char* str1, char* str2){
 
 void generar_assembler(Arbol* arbol, FILE* arch){
     
-    
+
     NodoA* padre = padreMasIzq(arbol);
     NodoA* condicion;
     NodoA* bloque;
@@ -762,3 +766,8 @@ int esComparador(char* op){
     return 0;
 }
 
+void maximo(){
+    if(contadorAuxiliares > cantidadAuxiliares){
+        cantidadAuxiliares = contadorAuxiliares;
+    }
+}

@@ -1,10 +1,8 @@
 init {
     z, a, b, c, d: Int
- 
+    pepe : String
 }
 
-a = 2 + 3 + 4
+pepe = "2 + 42"
 
-if (a < 3){
-    write("a")
-}
+a = 2+2
