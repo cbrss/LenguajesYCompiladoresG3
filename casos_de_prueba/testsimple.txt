@@ -3,9 +3,8 @@ init {
  
 }
 
-if (a < b){
+a = 2 + 3 + 4
+
+if (a < 3){
     write("a")
-    if(b < d){
-        write("b")
-    }
 }

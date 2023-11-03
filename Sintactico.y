@@ -126,6 +126,7 @@ programa_prima:
                     imprimirEncabezado(&listaSimbolos );
                     FILE *arch = fopen("final.asm", "a");
                     generar_assembler(&compilado, arch);
+                    fclose(arch);
                 }
                 else{
                     printf("R1: ERROR DE COMPILACION\n");
@@ -331,7 +332,7 @@ asignacion:
             return 1;
         }
         
-        AsigPtr = crearNodo("=", Eptr, crearHoja($1));
+        AsigPtr = crearNodo("=", crearHoja($1), Eptr);
     
     }
     |ID OP_AS string  { 
@@ -344,7 +345,7 @@ asignacion:
             printf("\nError, datos de diferente tipo.\n");
             return 1;
         }
-        AsigPtr = crearNodo("=", StrPtr, crearHoja($1));
+        AsigPtr = crearNodo("=", crearHoja($1), StrPtr);
     }
     ;
 
@@ -532,7 +533,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
     NodoA* padre = padreMasIzq(arbol);
     NodoA* condicion;
     NodoA* bloque;
-
+    
     while(padre!= NULL){
         printf("\n*%s*\n", padre->simbolo);
 
@@ -541,23 +542,23 @@ void generar_assembler(Arbol* arbol, FILE* arch){
         }
 
         if(strcmp(padre->simbolo, "=") == 0){
-  
-            strcpy(auxTipo, obtenerTipo(&listaSimbolos, padre->der->simbolo));
+      
+            strcpy(auxTipo, obtenerTipo(&listaSimbolos, padre->izq->simbolo));
             
+            //posiblemente haya que preguntar, si der es string haya que hacer otra cosa
+            generar_assembler(&padre->der, arch);
             fprintf(arch, "FLD %s\n", padre->der->simbolo);
             if(strcmp(auxTipo, "Int") == 0){
                 fprintf(arch, "FRNDINT\n");
             }
 
-            //cada uno de los if de operaciones actualizar padre->simbolo con el @aux
             fprintf(arch, "FSTP %s\n", padre->izq->simbolo);
-            //posiblemente borrar hijos
 
             contOp = 1;
           
         }
         if(esOperacionAritmetica(padre->simbolo)  == 1){
-                
+
             if(strcmp(padre->simbolo, "+") == 0){
                 fprintf(arch, "FLD %s\n", padre->izq->simbolo);
                 fprintf(arch, "FLD %s\n", padre->der->simbolo);
