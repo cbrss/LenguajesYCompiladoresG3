@@ -1,10 +1,15 @@
 nombre                                            |tipoDato|valor                                             |longitud  
-z                                                 |Int    |                                                  |0         
 pepe                                              |String |                                                  |0         
+h                                                 |Int    |                                                  |0         
+g                                                 |Int    |                                                  |0         
+f                                                 |Int    |                                                  |0         
+e                                                 |Int    |                                                  |0         
 d                                                 |Int    |                                                  |0         
 c                                                 |Int    |                                                  |0         
 b                                                 |Int    |                                                  |0         
 a                                                 |Int    |                                                  |0         
-_true                                             |String |true                                              |4         
-_false                                            |String |false                                             |5         
-_Asdasdasdas                                      |String |Asdasdasdas                                       |11        
+_true_interno                                     |String |true interno                                      |12        
+_true_externo                                     |String |true externo                                      |12        
+_fin_true_externo                                 |String |fin true externo                                  |16        
+_false_interno                                    |String |false interno                                     |13        
+_false_externo                                    |String |false externo                                     |13        

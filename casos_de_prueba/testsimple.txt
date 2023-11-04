@@ -1,17 +1,17 @@
 init {
-    z, a, b, c, d: Int
+    a, b, c, d: Int
+    e,f,g,h : Int
     pepe : String
 }
 
 if( a < b || c < d){
-    if( a < b || c < d){
-    write("true")
-    } else{
-        write("false")
-    }
+    write("true externo")
+    if( e < f || g < h){
+        write("true interno")
+        } else{
+            write("false interno")
+        }
+    write("fin true externo")
 } else{
-    write("false")
+    write("false externo")
 }
-write("Asdasdasdas")
-
-

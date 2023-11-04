@@ -685,7 +685,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                 apilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
 
                 contFalso++;
-            } else{ //condicion multiple
+            } else if(esOperadorLogico(padre->izq->simbolo) == 1){ //condicion multiple
                 NodoA* opLogico = padre->izq;
 
                 if(strcmp(padre->izq->simbolo, "&") == 0){
@@ -777,9 +777,9 @@ void generar_assembler(Arbol* arbol, FILE* arch){
 
                     apilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
                     contFalso++;
-                } else{ // ||
+                } else if(strcmp(padre->izq->simbolo, "||") == 0){ 
                     invertirCondicion(opLogico->izq);
-                    //invertirCondicion(opLogico->der);
+                  
 
                     fprintf(arch, "fld %s\n", opLogico->izq->izq->simbolo);
                      
@@ -823,13 +823,12 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                         strcat(etiquetaFalso, nro);
                         fprintf(arch, "JNE %s\n", etiquetaFalso);
                     }
-
+                    contFalso++;
                     //2da condicion ///ETIQUETA OR
                 
                     fprintf(arch, "fld %s\n", opLogico->der->izq->simbolo);
                     fprintf(arch, "fcomp %s\n", opLogico->der->der->simbolo);
-                    
-                    
+                
                     fprintf(arch, "fstsw ax\n");    //los flags del coprocesador en memoria
                     fprintf(arch, "sahf\n");        //guardo los flags que estan en memoria en el registro FLAG del cpu
                     
@@ -867,10 +866,10 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                         strcat(etiquetaOr, nro);
                         fprintf(arch, "JNE %s\n", etiquetaOr);
                     }
-
+                    desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
+                    fprintf(arch, "%s\n", etiquetaFalso);  
                     apilar(&ifOr, etiquetaOr, sizeof(etiquetaOr));
                     contOr++;
-                    //contVerdadero++;
                   
                     operadorOr = 1;
                 }
@@ -878,24 +877,27 @@ void generar_assembler(Arbol* arbol, FILE* arch){
 
             if(strcmp(padre->der->simbolo, "Cuerpo") == 0){ //if con else
                 if(operadorOr == 1){
+                    
+
+                    generar_assembler(&padre->der->izq, arch);  //true
                     strcpy(etiquetaVerdadero, "verdadero");
                     itoa(contVerdadero, nro, 10);
                     strcat(etiquetaVerdadero, nro);
-                    
 
-                    char auxOr[100];
-                    
-                    apilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
-                    desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
-                    fprintf(arch, "%s\n", etiquetaFalso);
-                    
-                    generar_assembler(&padre->der->izq, arch);  //true
                     contVerdadero++;
-                    desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
-
+                    apilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
                     fprintf(arch, "BI %s\n", etiquetaVerdadero);
+
+                    
+
                     desapilar(&ifOr, etiquetaOr, sizeof(etiquetaOr));
                     fprintf(arch, "%s\n", etiquetaOr);
+
+                    generar_assembler(&padre->der->der, arch);  //false
+                    desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
+                    fprintf(arch, "%s\n", etiquetaVerdadero);  
+
+                    
                     
                     operadorOr = 0;
                 } else{
@@ -903,18 +905,22 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                     strcpy(etiquetaVerdadero, "verdadero");
                     itoa(contVerdadero, nro, 10);
                     strcat(etiquetaVerdadero, nro);
+
                     contVerdadero++;
                     apilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
-
                     fprintf(arch, "BI %s\n", etiquetaVerdadero);
+
                     desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
                     fprintf(arch, "%s\n", etiquetaFalso);  
+                    generar_assembler(&padre->der->der, arch);  //false
+                    desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
+                    fprintf(arch, "%s\n", etiquetaVerdadero);  
                 }
                 
                 
-                generar_assembler(&padre->der->der, arch);  //false
-                desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
-                fprintf(arch, "%s\n", etiquetaVerdadero);  
+                
+                
+                printf("\n\ndesapilando: %s**\n\n", etiquetaVerdadero);
                 
             } else{ //if sin else
                 if(operadorOr == 1){
