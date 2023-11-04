@@ -58,11 +58,6 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
     {
         lista = &(*lista)->sig;
     }
-
-    // a int
-    // a
-    // a str
-
    
     if (*lista != NULL && tDato == tID && strcmp((*lista)->simb.nombre, nuevo_simbolo.nombre) == 0)
     {
@@ -240,7 +235,7 @@ void imprimirEncabezado(Lista* lista, int cantAux){
     int i = 1;
     if(cantAux != -1){
         while(cantAux != 0){
-            fprintf(arch, "@aux%d dd \n",i);
+            fprintf(arch, "@aux%d dd ??\n",i);
             i++;
             cantAux--;
         }

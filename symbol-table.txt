@@ -5,5 +5,6 @@ d                                                 |Int    |                     
 c                                                 |Int    |                                                  |0         
 b                                                 |Int    |                                                  |0         
 a                                                 |Int    |                                                  |0         
-_2_+_42                                           |String |2 + 42                                            |6         
-_2                                                |Int    |2                                                 |1         
+_true                                             |String |true                                              |4         
+_false                                            |String |false                                             |5         
+_Asdasdasdas                                      |String |Asdasdasdas                                       |11        

@@ -1,0 +1,31 @@
+and:
+fld a
+fcomp b
+fstsw ax
+sahf
+JNB falso0
+
+fld c
+fcomp d
+fstsw ax
+sahf
+JNB falso0
+
+Bloque ejec
+falso0
+
+or: 
+fld a
+fcomp b
+fstsw ax
+sahf
+JNB falso0
+
+fld c
+fcomp d
+fstsw ax
+sahf
+JNB falso0
+
+falso0
+bloque ejec

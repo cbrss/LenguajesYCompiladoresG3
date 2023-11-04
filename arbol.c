@@ -1,4 +1,5 @@
 #include "arbol.h"
+int esComparadorArbol(char* op);
 
 void crearArbol(Arbol *pa)
 {
@@ -80,7 +81,7 @@ NodoA *padreMasIzq(Arbol *pa) {
     if (res)
         return res;
     
-    if ((*pa)->izq  && (*pa)->der){
+    if ((*pa)->izq  && (*pa)->der && !esComparadorArbol((*pa)->simbolo)){
         return *pa;
     }
     res = padreMasIzq(&(*pa)->der);
@@ -109,4 +110,18 @@ void borrarHijos(NodoA* pa){
 		free(pa->der);
 		pa->der = NULL;
 	}
+}
+
+int esComparadorArbol(char* op){
+    if(strcmp(op, "<") == 0 ||
+        strcmp(op, "<=") == 0 ||
+        strcmp(op, ">") == 0 ||
+        strcmp(op, ">=") == 0 ||
+        strcmp(op, "==") == 0 ||
+        strcmp(op, "!=") == 0 ||
+        strcmp(op, "&") == 0 ||
+        strcmp(op, "||") == 0 )
+        return 1;
+
+    return 0;
 }

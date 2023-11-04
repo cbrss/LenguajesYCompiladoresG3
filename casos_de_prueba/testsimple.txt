@@ -3,6 +3,15 @@ init {
     pepe : String
 }
 
-pepe = "2 + 42"
+if( a < b || c < d){
+    if( a < b || c < d){
+    write("true")
+    } else{
+        write("false")
+    }
+} else{
+    write("false")
+}
+write("Asdasdasdas")
 
-a = 2+2
+
