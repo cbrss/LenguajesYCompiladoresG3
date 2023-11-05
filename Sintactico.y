@@ -29,13 +29,13 @@
     Lista listaIds;
     Pila anidaciones;
     Pila condAnidados;
-    Pila ifOr;
+
 
     Cola colaIds;
     
     int boolCompiladoOK = 1;
 
-    Pila ifFalso, ifVerdadero;
+    Pila ifFalso, ifVerdadero, ifOr, cicloAnidados;
 
     NodoA* CompiladoPtr, *ProgramaPtr, *DeclaPtr, *BloPtr, *DecPtr, *ListPtr, *SentPtr, *AsigPtr, *tipoAux,
             *CicPtr, *EvalPtr, *Eptr, *StrPtr, *ConPtr, *CmpPtr, *EptrAux, *BloAux, *Tptr, *Fptr, *CmpAux, *StrPtrAux;
@@ -60,9 +60,11 @@
     int contFalso = 0; //
     int contVerdadero = 0;
     int contOr = 0;
+    int contCiclo = 0;
     char etiquetaFalso[100]; //apilar etiquetas true y false
     char etiquetaVerdadero[100];
     char etiquetaOr[100];
+    char etiquetaCiclo[100];
     char nro[100];
 
     int operadorOr = 0;
@@ -238,7 +240,7 @@ sentencia:
             printf("\nError, id: *%s* no fue declarado\n", $3);
             return 1;
         };
-    SentPtr = crearNodo("=", crearHoja($3), crearHoja("READ"));
+    SentPtr = crearNodo("READ", crearHoja($3), crearHoja("NULL"));
     }
     |ASIGCOMP PA CA dec_asig_mul CC PC {
         printf("\t\tRespecial1: asigcomp ( [ dec_asig ]) es Sentencia\n");
@@ -487,6 +489,8 @@ int main(int argc, char *argv[]) {
     crearPila(&ifFalso);
     crearPila(&ifVerdadero);
     crearPila(&ifOr);
+    crearPila(&cicloAnidados);
+
     if((yyin = fopen(argv[1], "rt"))==NULL) { 
         printf("\nNo se puede abrir el archivo de prueba: %s\n", argv[1]);
     }
@@ -497,8 +501,7 @@ int main(int argc, char *argv[]) {
 
     imprimirLista(&listaSimbolos);
     
-    //padre = padreMasIzq(&compilado);
-   
+
     vaciarLista(&listaSimbolos);
     vaciarLista(&listaIds);
     vaciarPila(&anidaciones);
@@ -508,6 +511,8 @@ int main(int argc, char *argv[]) {
     vaciarPila(&ifFalso);
     vaciarPila(&ifVerdadero);
     vaciarPila(&ifOr);
+    vaciarPila(&cicloAnidados);
+
     return 0;
 }
  
@@ -538,7 +543,17 @@ char* concatenar(char* str1, char* str2, int n){
 }
 
 int estaContenido(char* str1, char* str2){ 
-    return strstr(str1,str2) != NULL;
+    char aux1[STRING_LARGO_MAX];
+    char aux2[STRING_LARGO_MAX];
+
+    strncpy(aux1, str1+1, strlen(str1)-1);
+    strncpy(aux2, str2+1, strlen(str2)-1);
+    //strcat(aux1, '\0');
+    //strcat(aux2, '\0');
+    aux1[strlen(str1)-2] = '\0';
+    aux2[strlen(str2)-2] = '\0';
+    
+    return strstr(aux1, aux2) != NULL;
 }
 
 void generar_assembler(Arbol* arbol, FILE* arch){
@@ -564,7 +579,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
             fprintf(arch, "FLD %s\n", padre->der->simbolo);
             if(strcmp(auxTipo, "Int") == 0){
                 fprintf(arch, "FRNDINT\n");
-            }
+            } 
             //TODO: si es String usar _2_+_42, posiblemente buscar en TS
 
             fprintf(arch, "FSTP %s\n", padre->izq->simbolo);
@@ -633,11 +648,18 @@ void generar_assembler(Arbol* arbol, FILE* arch){
         }
        
         if(strcmp(padre->simbolo, "Write") == 0){
-            fprintf(arch, "dato: %s\n", padre->izq->simbolo);
+            fprintf(arch, "displayString %s\n", padre->izq->simbolo);
+        }
+        
+        if(strcmp(padre->simbolo, "READ") == 0){
+            fprintf(arch, "getString %s\n", padre->izq->simbolo);
         }
 
         if(strcmp(padre->simbolo, "if") == 0 ){
-           
+            if(strcmp(padre->der->simbolo, "Cuerpo") == 0){
+                existeElse = 1;
+            }
+         
             if(esComparador(padre->izq->simbolo) == 1){   //condicion simple
            
                 fprintf(arch, "fld %s\n", padre->izq->izq->simbolo);
@@ -780,11 +802,8 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                 } else if(strcmp(padre->izq->simbolo, "||") == 0){ 
                     invertirCondicion(opLogico->izq);
                   
-
                     fprintf(arch, "fld %s\n", opLogico->izq->izq->simbolo);
-                     
                     fprintf(arch, "fcomp %s\n", opLogico->izq->der->simbolo);
-
                     
                     fprintf(arch, "fstsw ax\n");    //los flags del coprocesador en memoria
                     fprintf(arch, "sahf\n");        //guardo los flags que estan en memoria en el registro FLAG del cpu
@@ -866,8 +885,13 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                         strcat(etiquetaOr, nro);
                         fprintf(arch, "JNE %s\n", etiquetaOr);
                     }
-                    desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
-                    fprintf(arch, "%s\n", etiquetaFalso);  
+
+                    if(existeElse == 1){
+                        desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
+                        fprintf(arch, "%s\n", etiquetaFalso);  
+                        existeElse = 0;
+                    }
+
                     apilar(&ifOr, etiquetaOr, sizeof(etiquetaOr));
                     contOr++;
                   
@@ -876,9 +900,8 @@ void generar_assembler(Arbol* arbol, FILE* arch){
             }
 
             if(strcmp(padre->der->simbolo, "Cuerpo") == 0){ //if con else
-                if(operadorOr == 1){
-                    
-
+                
+                if(operadorOr == 1){    //si op logico es OR || 
                     generar_assembler(&padre->der->izq, arch);  //true
                     strcpy(etiquetaVerdadero, "verdadero");
                     itoa(contVerdadero, nro, 10);
@@ -900,7 +923,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                     
                     
                     operadorOr = 0;
-                } else{
+                } else{                 // cualquier otro caso
                     generar_assembler(&padre->der->izq, arch);  //true
                     strcpy(etiquetaVerdadero, "verdadero");
                     itoa(contVerdadero, nro, 10);
@@ -916,18 +939,16 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                     desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
                     fprintf(arch, "%s\n", etiquetaVerdadero);  
                 }
-                
-                
-                
-                
-                printf("\n\ndesapilando: %s**\n\n", etiquetaVerdadero);
-                
+ 
             } else{ //if sin else
                 if(operadorOr == 1){
                     //  TODO: cambiar etiqueta a verdadero
                     desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
                     fprintf(arch, "%s\n", etiquetaFalso);
                     generar_assembler(&padre->der, arch);
+                    
+                    desapilar(&ifOr, etiquetaOr, sizeof(etiquetaOr));
+                    fprintf(arch, "%s\n", etiquetaOr);
                     
                     operadorOr = 0;
                 } else{
@@ -938,7 +959,268 @@ void generar_assembler(Arbol* arbol, FILE* arch){
             }
         }
 
-        
+        if(strcmp(padre->simbolo, "ciclo") == 0){
+            strcpy(etiquetaCiclo, "etiquetaCiclo");
+            itoa(contCiclo, nro, 10);
+            strcat(etiquetaCiclo, nro);
+            fprintf(arch, "%s\n", etiquetaCiclo);
+            apilar(&cicloAnidados, etiquetaCiclo, sizeof(etiquetaCiclo));
+            contCiclo++;
+
+            if(esComparador(padre->izq->simbolo) == 1){   //condicion simple
+           
+                fprintf(arch, "fld %s\n", padre->izq->izq->simbolo);
+                fprintf(arch, "fcomp %s\n", padre->izq->der->simbolo);
+
+                
+                fprintf(arch, "fstsw ax\n");    //los flags del coprocesador en memoria
+                fprintf(arch, "sahf\n");        //guardo los flags que estan en memoria en el registro FLAG del cpu
+                
+                strcpy(etiquetaFalso, "falso");
+
+                if(strcmp(padre->izq->simbolo, "<") == 0){
+                    
+                    itoa(contFalso, nro, 10);
+                    strcat(etiquetaFalso, nro);
+                    fprintf(arch, "JNB %s\n", etiquetaFalso);   //ini
+                    
+                } else if (strcmp(padre->izq->simbolo, ">") == 0){
+
+                    itoa(contFalso, nro, 10);
+                    strcat(etiquetaFalso, nro);
+                    fprintf(arch, "JBE %s\n", etiquetaFalso);
+                } else if (strcmp(padre->izq->simbolo, "<=") == 0){
+
+                    itoa(contFalso, nro, 10);
+                    strcat(etiquetaFalso, nro);
+                    fprintf(arch, "JNBE %s\n", etiquetaFalso);
+                } else if (strcmp(padre->izq->simbolo, ">=") == 0){
+                
+                    itoa(contFalso, nro, 10);
+                    strcat(etiquetaFalso, nro);
+                    fprintf(arch, "JNAE %s\n", etiquetaFalso);
+                } else if (strcmp(padre->izq->simbolo, "!=") == 0){
+
+                    itoa(contFalso, nro, 10);
+                    strcat(etiquetaFalso, nro);
+                    fprintf(arch, "JE %s\n", etiquetaFalso);
+                } else if (strcmp(padre->izq->simbolo, "==") == 0){
+
+                    itoa(contFalso, nro, 10);
+                    strcat(etiquetaFalso, nro);
+                    fprintf(arch, "JNE %s\n", etiquetaFalso);
+                }
+
+                apilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
+
+                contFalso++;
+            } else if(esOperadorLogico(padre->izq->simbolo) == 1){ //condicion multiple
+                NodoA* opLogico = padre->izq;
+
+                if(strcmp(padre->izq->simbolo, "&") == 0){
+                    fprintf(arch, "fld %s\n", opLogico->izq->izq->simbolo);
+                    fprintf(arch, "fcomp %s\n", opLogico->izq->der->simbolo);
+
+                    
+                    fprintf(arch, "fstsw ax\n");    //los flags del coprocesador en memoria
+                    fprintf(arch, "sahf\n");        //guardo los flags que estan en memoria en el registro FLAG del cpu
+                    
+                    strcpy(etiquetaFalso, "falso");
+
+                    if(strcmp(opLogico->izq->simbolo, "<") == 0){
+                        
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNB %s\n", etiquetaFalso);   //ini
+                        
+                    } else if (strcmp(opLogico->izq->simbolo, ">") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JBE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->izq->simbolo, "<=") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNBE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->izq->simbolo, ">=") == 0){
+                    
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNAE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->izq->simbolo, "!=") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->izq->simbolo, "==") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNE %s\n", etiquetaFalso);
+                    }
+
+                    //2da condicion
+                
+                    fprintf(arch, "fld %s\n", opLogico->der->izq->simbolo);
+                    fprintf(arch, "fcomp %s\n", opLogico->der->der->simbolo);
+                    
+                    
+                    fprintf(arch, "fstsw ax\n");    //los flags del coprocesador en memoria
+                    fprintf(arch, "sahf\n");        //guardo los flags que estan en memoria en el registro FLAG del cpu
+                    
+                    strcpy(etiquetaFalso, "falso");
+
+                    if(strcmp(opLogico->der->simbolo, "<") == 0){
+                        
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNB %s\n", etiquetaFalso);   //ini
+                        
+                    } else if (strcmp(opLogico->der->simbolo, ">") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JBE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->der->simbolo, "<=") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNBE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->der->simbolo, ">=") == 0){
+                    
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNAE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->der->simbolo, "!=") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->der->simbolo, "==") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNE %s\n", etiquetaFalso);
+                    }
+
+                    apilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
+                    contFalso++;
+                } else if(strcmp(padre->izq->simbolo, "||") == 0){ 
+                    
+                    invertirCondicion(opLogico->izq);
+                  
+                    fprintf(arch, "fld %s\n", opLogico->izq->izq->simbolo);
+                    fprintf(arch, "fcomp %s\n", opLogico->izq->der->simbolo);
+                    
+                    fprintf(arch, "fstsw ax\n");    //los flags del coprocesador en memoria
+                    fprintf(arch, "sahf\n");        //guardo los flags que estan en memoria en el registro FLAG del cpu
+                    
+                    strcpy(etiquetaVerdadero, "verdadero");
+
+                    if(strcmp(opLogico->izq->simbolo, "<") == 0){
+                        
+                        itoa(contVerdadero, nro, 10);
+                        strcat(etiquetaVerdadero, nro);
+                        fprintf(arch, "JNB %s\n", etiquetaVerdadero);   //ini
+                        
+                    } else if (strcmp(opLogico->izq->simbolo, ">") == 0){
+
+                        itoa(contVerdadero, nro, 10);
+                        strcat(etiquetaVerdadero, nro);
+                        fprintf(arch, "JBE %s\n", etiquetaVerdadero);
+                    } else if (strcmp(opLogico->izq->simbolo, "<=") == 0){
+
+                        itoa(contVerdadero, nro, 10);
+                        strcat(etiquetaVerdadero, nro);
+                        fprintf(arch, "JNBE %s\n", etiquetaVerdadero);
+                    } else if (strcmp(opLogico->izq->simbolo, ">=") == 0){
+                    
+                        itoa(contVerdadero, nro, 10);
+                        strcat(etiquetaVerdadero, nro);
+                        fprintf(arch, "JNAE %s\n", etiquetaVerdadero);
+                    } else if (strcmp(opLogico->izq->simbolo, "!=") == 0){
+
+                        itoa(contVerdadero, nro, 10);
+                        strcat(etiquetaVerdadero, nro);
+                        fprintf(arch, "JE %s\n", etiquetaVerdadero);
+                    } else if (strcmp(opLogico->izq->simbolo, "==") == 0){
+
+                        itoa(contVerdadero, nro, 10);
+                        strcat(etiquetaVerdadero, nro);
+                        fprintf(arch, "JNE %s\n", etiquetaVerdadero);
+                    }
+
+                    //apilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
+
+                    contVerdadero++;
+
+                    //2da condicion ///ETIQUETA OR
+                
+                    fprintf(arch, "fld %s\n", opLogico->der->izq->simbolo);
+                    fprintf(arch, "fcomp %s\n", opLogico->der->der->simbolo);
+                
+                    fprintf(arch, "fstsw ax\n");    //los flags del coprocesador en memoria
+                    fprintf(arch, "sahf\n");        //guardo los flags que estan en memoria en el registro FLAG del cpu
+                    
+                    strcpy(etiquetaFalso, "falso");
+
+                    if(strcmp(opLogico->der->simbolo, "<") == 0){
+                        
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNB %s\n", etiquetaFalso);   //ini
+                        
+                    } else if (strcmp(opLogico->der->simbolo, ">") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JBE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->der->simbolo, "<=") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNBE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->der->simbolo, ">=") == 0){
+                    
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNAE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->der->simbolo, "!=") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JE %s\n", etiquetaFalso);
+                    } else if (strcmp(opLogico->der->simbolo, "==") == 0){
+
+                        itoa(contFalso, nro, 10);
+                        strcat(etiquetaFalso, nro);
+                        fprintf(arch, "JNE %s\n", etiquetaFalso);
+                    }
+
+                 
+                    apilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
+
+                    //desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
+                    fprintf(arch, "%s\n", etiquetaVerdadero);
+                    contFalso++;
+                }
+            }
+            
+            
+            
+
+            generar_assembler(&padre->der, arch);
+            
+            desapilar(&cicloAnidados, etiquetaCiclo, sizeof(etiquetaCiclo));
+            fprintf(arch, "BI %s\n", etiquetaCiclo);
+           
+            desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
+            fprintf(arch, "%s\n", etiquetaFalso);
+
+        }
+
+
         borrarHijos(padre);
         padre = padreMasIzq(arbol);
     }
@@ -997,16 +1279,16 @@ void maximo(){
 
 void invertirCondicion(NodoA* padre){
     if(strcmp(padre->simbolo, "<") == 0){
-        strcpy(padre->simbolo, ">");
-    }
-    else if(strcmp(padre->simbolo, ">") == 0){
-        strcpy(padre->simbolo, "<");
-    }
-    else if(strcmp(padre->simbolo, "<=") == 0){
         strcpy(padre->simbolo, ">=");
     }
-    else if(strcmp(padre->simbolo, ">=") == 0){
+    else if(strcmp(padre->simbolo, ">") == 0){
         strcpy(padre->simbolo, "<=");
+    }
+    else if(strcmp(padre->simbolo, "<=") == 0){
+        strcpy(padre->simbolo, ">");
+    }
+    else if(strcmp(padre->simbolo, ">=") == 0){
+        strcpy(padre->simbolo, "<");
     }
     else if(strcmp(padre->simbolo, "==") == 0){
         strcpy(padre->simbolo, "!=");

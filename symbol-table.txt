@@ -8,8 +8,6 @@ d                                                 |Int    |                     
 c                                                 |Int    |                                                  |0         
 b                                                 |Int    |                                                  |0         
 a                                                 |Int    |                                                  |0         
-_true_interno                                     |String |true interno                                      |12        
-_true_externo                                     |String |true externo                                      |12        
-_fin_true_externo                                 |String |fin true externo                                  |16        
-_false_interno                                    |String |false interno                                     |13        
-_false_externo                                    |String |false externo                                     |13        
+_t                                                |String |t                                                 |1         
+_avc                                              |String |avc                                               |3         
+_a                                                |String |a                                                 |1         

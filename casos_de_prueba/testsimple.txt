@@ -4,14 +4,6 @@ init {
     pepe : String
 }
 
-if( a < b || c < d){
-    write("true externo")
-    if( e < f || g < h){
-        write("true interno")
-        } else{
-            write("false interno")
-        }
-    write("fin true externo")
-} else{
-    write("false externo")
+if(estaContenido("avc", "t")) {
+    write("a")
 }

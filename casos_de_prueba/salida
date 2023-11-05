@@ -11,21 +11,10 @@ fstsw ax
 sahf
 JNB falso0
 
-Bloque ejec
-falso0
-
-or: 
+etiquetaCiclo
 fld a
-fcomp b
-fstsw ax
-sahf
-JNB falso0
-
-fld c
-fcomp d
-fstsw ax
-sahf
-JNB falso0
-
-falso0
-bloque ejec
+fcmp b
+JNB etiquetaFalso
+bloque ejecucion
+BI etiquetaCiclo
+etiquetaFalso
