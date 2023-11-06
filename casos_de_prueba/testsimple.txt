@@ -3,4 +3,4 @@ init {
 }
 
 
-c = !cont(2 :: [a])
+AsigComp([a, b, c] : [1, 2, 3])

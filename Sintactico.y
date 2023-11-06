@@ -256,7 +256,7 @@ sentencia:
     }
     |ASIGCOMP PA CA dec_asig_mul CC PC {
         printf("\t\tRespecial1: asigcomp ( [ dec_asig ]) es Sentencia\n");
-        SentPtr = DecAsigMPtr;
+        //SentPtr = DecAsigMPtr;
 
     }
     
