@@ -214,8 +214,10 @@ void imprimirEncabezado(Lista* lista, int cantAux){
         printf("Error al abrir el archivo\n");
         return;
     }
-  
-    fprintf(arch, ".MODEL LARGE\n.386\n.STACK 200h\n.DATA\n\n");
+    //number.asm
+    
+
+    fprintf(arch, ".MODEL LARGE\n.386\n.STACK 200h\nINCLUDE number.asm\n.DATA\n");
     while (*lista != NULL)
     {
         if (strlen((*lista)->simb.valor) == 0){     // si es ID

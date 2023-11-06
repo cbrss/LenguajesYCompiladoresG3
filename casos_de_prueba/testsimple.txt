@@ -1,6 +1,8 @@
 init {
-    a, b: Int
+    a, b: String
+    c : Int
    
 }
 
-
+a = "1"
+c = 1

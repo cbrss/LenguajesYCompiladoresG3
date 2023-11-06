@@ -131,7 +131,6 @@ programa_prima:
     programa    { compilado = ProgramaPtr;
                  if(boolCompiladoOK == 1){
                     printf("R1: COMPILACION EXITOSA\n");
-                    printf("\nCANTIDA AUX:%d", cantidadAuxiliares);
                     imprimirArbol(&compilado);
                     imprimirEncabezado(&listaSimbolos, cantidadAuxiliares - 1);
                     FILE *arch = fopen("final.asm", "a");
@@ -218,12 +217,17 @@ sentencia:
         printf("\t\tR17: timer(int,bloque_ejec) es Sentencia\n");
         snprintf(strAux, sizeof(intAux), "%d", intAux);
         SentPtr = crearNodo(
-            "ciclo", 
-            crearNodo("<", crearHoja("_i"), crearHoja(strAux)),
-            crearNodo(
-                "BloEjec", BloPtr, crearNodo("=", crearHoja("_i"), crearNodo("+", crearHoja("_i"), crearHoja("1")))
+                "ciclo", 
+                crearNodo("<", crearHoja("@_i"), crearHoja(strAux)),
+                    crearNodo(
+                        "BloEjec", BloPtr, 
+                        crearNodo("BloEjec", crearNodo("=", crearHoja("@_i"), crearHoja("0")),crearNodo("=", crearHoja("@_i"), crearNodo("+", crearHoja("@_i"), crearHoja("1")))
+                )
             )
         );
+        insertarEnLista(&listaSimbolos, "@_i",  tINT);
+        contadorAuxiliares++;
+        ;
     }
     |WRITE PA ID PC { 
         printf("\t\tR18: write(id) es Sentencia\n"); 
@@ -411,8 +415,19 @@ condicion:
     ;
 
 comparacion:
-    expresion { EptrAux = Eptr; } comparador expresion          { printf("\t\t\t\tR30: expresion comparador expresion es Comparacion \n"); CmpPtr = crearNodo(cmpAux, EptrAux, Eptr); }
-    |ESTA_CONT PA STRING { strcpy(strAux, $3); } COMA STRING PC { printf("\t\t\t\tR31: estaContenido(String, String) es Comparacion\n"); CmpPtr = crearHoja(estaContenido(strAux, yylval.string_val)? "true" : "false" ); }
+    expresion { EptrAux = Eptr; } comparador expresion          { printf("\t\t\t\tR30: expresion comparador expresion es Comparacion \n"); 
+        CmpPtr = crearNodo(cmpAux, EptrAux, Eptr); 
+        contadorAuxiliares = 0;
+    }
+    |ESTA_CONT PA STRING { strcpy(strAux, $3); } COMA STRING PC { printf("\t\t\t\tR31: estaContenido(String, String) es Comparacion\n"); 
+        if(estaContenido(strAux, yylval.string_val) == 1){
+            CmpPtr = crearNodo("==", crearHoja("1"), crearHoja("1"));
+        } else{
+            CmpPtr = crearNodo("==", crearHoja("1"), crearHoja("0"));
+        }
+        
+    }
+    
     |NOT comparacion                                            { printf("\t\t\t\tR32: not comparacion es Comparacion\n"); CmpPtr = crearNodo("&", crearHoja("false"), CmpPtr); }
     |NOT expresion                                              { printf("\t\t\t\tR33: not expresion es Comparacion\n"); CmpPtr = crearNodo("&", crearHoja("false"), Eptr); }
     ;
@@ -1218,10 +1233,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                     contFalso++;
                 }
             }
-            
-            
-            
-
+            printf("\ntengo: %s\n", padre->der->simbolo);
             generar_assembler(&padre->der, arch);
             
             desapilar(&cicloAnidados, etiquetaCiclo, sizeof(etiquetaCiclo));
