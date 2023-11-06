@@ -46,6 +46,7 @@
 
     char  auxTipo[7], strAux[VALOR_LARGO_MAX + 1], strAux2[VALOR_LARGO_MAX + 1], cmpAux[3], opAux[3];
     char strAuxAsig[VALOR_LARGO_MAX + 1];
+    char auxValor[VALOR_LARGO_MAX];
     int intAux;
     float floatAux;
     int contador;
@@ -592,12 +593,8 @@ void generar_assembler(Arbol* arbol, FILE* arch){
             //posiblemente haya que preguntar, si der es string haya que hacer otra cosa
             generar_assembler(&padre->der, arch);
             if(strcmp(auxTipo, "String") == 0){
-                // quitar " " de padre->der->simbolo
-                // buscar por valor y traer nombre
-                // tener en cuenta el tipo de dato
-
-                fprintf(arch, "FLD %s\n", padre->der->simbolo);
-
+                strncpy(auxValor, padre->der->simbolo + 1, strlen(padre->der->simbolo) - 2); // substring del simbolo sin las ""
+                fprintf(arch, "FLD %s\n", obtenerNombre(&listaSimbolos, auxValor, TSTRING));
             } else{
                 fprintf(arch, "FLD %s\n", padre->der->simbolo);
             }

@@ -80,6 +80,18 @@ void sacarEspacios(char *str) {
     }
 }
 
+char* obtenerNombre(Lista *lista, char* valor, char* tDato) {
+    while ((*lista != NULL) && (strcmp((*lista)->simb.valor, valor) != 0 || strcmp((*lista)->simb.tipo_dato, tDato) != 0))
+    {
+        lista = &(*lista)->sig;
+    }
+    if (*lista != NULL && strcmp((*lista)->simb.valor, valor) == 0 && strcmp((*lista)->simb.tipo_dato, tDato) == 0)
+    {
+        return (*lista)->simb.nombre;
+    }
+    return NULL;
+}
+
 void imprimirLista(Lista *lista)
 {
     FILE *arch = fopen("symbol-table.txt", "w");
@@ -186,6 +198,14 @@ char *obtenerTipo(Lista *lista, char *id)
         return (*lista)->simb.tipo_dato;
     }
     return NULL;
+}
+
+char *obtenerSinComillas(char* str) 
+{
+    int len = strlen(str);
+    char strCopy[len];
+    strncpy(strCopy, str + 1, len - 2);
+    return strCopy;
 }
 
 int listaVacia(Lista* lista)
