@@ -16,7 +16,7 @@
     char* concatenar(char*, char*, int);
     int estaContenido(char*, char*);
     void generar_assembler(Arbol* arbol, FILE* arch);
-
+    void generar_fin(FILE* arch);
     int esOperacionAritmetica(char* op);
     int esOperadorLogico(char* op);
     int esComparador(char* op);
@@ -136,6 +136,7 @@ programa_prima:
                     imprimirEncabezado(&listaSimbolos, cantidadAuxiliares - 1);
                     FILE *arch = fopen("final.asm", "a");
                     generar_assembler(&compilado, arch);
+                    generar_fin(arch);
                     fclose(arch);
                 }
                 else{
@@ -236,16 +237,21 @@ sentencia:
             printf("\nError, id: *%s* no fue declarado\n", $3);
             return 1;
         };
-    SentPtr = crearNodo("Write", crearHoja($3), crearHoja("DirMem"));
+
+        strcpy(auxTipo, obtenerTipo(&listaSimbolos, $3));
+        SentPtr = crearNodo("Write", crearHoja($3), crearHoja(auxTipo));
     }
-    |WRITE PA STRING PC { printf("\t\tR19: write(string) es Sentencia\n"); SentPtr = crearNodo("Write", crearHoja($3), crearHoja("DirMem")); }
+    |WRITE PA STRING PC { printf("\t\tR19: write(string) es Sentencia\n");
+        SentPtr = crearNodo("Write", crearHoja($3), crearHoja("Literal")); }
+
     |READ PA ID PC      { 
         printf("\t\tR20: read(id) es Sentencia\n"); 
         if(!idDeclarado(&listaSimbolos, $3)){ 
             printf("\nError, id: *%s* no fue declarado\n", $3);
             return 1;
         };
-    SentPtr = crearNodo("READ", crearHoja($3), crearHoja("NULL"));
+        strcpy(auxTipo, obtenerTipo(&listaSimbolos, $3));
+        SentPtr = crearNodo("READ", crearHoja($3), crearHoja(auxTipo));
     }
     |ASIGCOMP PA CA dec_asig_mul CC PC {
         printf("\t\tRespecial1: asigcomp ( [ dec_asig ]) es Sentencia\n");
@@ -580,7 +586,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
     NodoA* bloque;
     
     while(padre!= NULL){
-        printf("\n*%s*\n", padre->simbolo);
+        //printf("\n*%s*\n", padre->simbolo);
 
         if(strcmp(padre->simbolo, "BloEjec") == 0){
             generar_assembler(&padre->der,arch);
@@ -672,11 +678,31 @@ void generar_assembler(Arbol* arbol, FILE* arch){
         }
        
         if(strcmp(padre->simbolo, "Write") == 0){
-            fprintf(arch, "displayString %s\n", padre->izq->simbolo);
+            
+      
+            if(strcmp(padre->der->simbolo, "Int") == 0){
+                fprintf(arch, "DisplayInteger %s\n", padre->izq->simbolo);
+            } else if (strcmp(padre->der->simbolo, "Float") == 0){
+                fprintf(arch, "DisplayFloat %s , 2\n", padre->izq->simbolo);
+            } else if (strcmp(padre->der->simbolo, "String") == 0){
+                fprintf(arch, "displayString %s\n", padre->izq->simbolo);
+            } else{ //este caso imprimo un string literal
+                obtenerSinComillas(auxValor, padre->izq->simbolo);
+                fprintf(arch, "displayString %s\n", obtenerNombre(&listaSimbolos, auxValor, TSTRING));
+            }
+            fprintf(arch, "newLine 1\n");
+           
+            
         }
         
         if(strcmp(padre->simbolo, "READ") == 0){
-            fprintf(arch, "getString %s\n", padre->izq->simbolo);
+            if(strcmp(padre->der->simbolo, "Int") == 0){
+                fprintf(arch, "getInteger %s\n", padre->izq->simbolo);
+            } else if(strcmp(padre->der->simbolo, "Float") == 0){
+                fprintf(arch, "getFloat %s\n", padre->izq->simbolo);
+            } else if(strcmp(padre->der->simbolo, "String") == 0){
+                fprintf(arch, "getString %s\n", padre->izq->simbolo);
+            }
         }
 
         if(strcmp(padre->simbolo, "if") == 0 ){
@@ -912,7 +938,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
 
                     if(existeElse == 1){
                         desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
-                        fprintf(arch, "%s\n", etiquetaFalso);  
+                        fprintf(arch, "%s:\n", etiquetaFalso);  
                         existeElse = 0;
                     }
 
@@ -938,11 +964,11 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                     
 
                     desapilar(&ifOr, etiquetaOr, sizeof(etiquetaOr));
-                    fprintf(arch, "%s\n", etiquetaOr);
+                    fprintf(arch, "%s:\n", etiquetaOr);
 
                     generar_assembler(&padre->der->der, arch);  //false
                     desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
-                    fprintf(arch, "%s\n", etiquetaVerdadero);  
+                    fprintf(arch, "%s:\n", etiquetaVerdadero);  
 
                     
                     
@@ -958,27 +984,27 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                     fprintf(arch, "BI %s\n", etiquetaVerdadero);
 
                     desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
-                    fprintf(arch, "%s\n", etiquetaFalso);  
+                    fprintf(arch, "%s:\n", etiquetaFalso);  
                     generar_assembler(&padre->der->der, arch);  //false
                     desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
-                    fprintf(arch, "%s\n", etiquetaVerdadero);  
+                    fprintf(arch, "%s:\n", etiquetaVerdadero);  
                 }
  
             } else{ //if sin else
                 if(operadorOr == 1){
                     //  TODO: cambiar etiqueta a verdadero
                     desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
-                    fprintf(arch, "%s\n", etiquetaFalso);
+                    fprintf(arch, "%s:\n", etiquetaFalso);
                     generar_assembler(&padre->der, arch);
                     
                     desapilar(&ifOr, etiquetaOr, sizeof(etiquetaOr));
-                    fprintf(arch, "%s\n", etiquetaOr);
+                    fprintf(arch, "%s:\n", etiquetaOr);
                     
                     operadorOr = 0;
                 } else{
                     generar_assembler(&padre->der, arch);
                     desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
-                    fprintf(arch, "%s\n", etiquetaFalso);
+                    fprintf(arch, "%s:\n", etiquetaFalso);
                 }
             }
         }
@@ -1226,18 +1252,17 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                     apilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
 
                     //desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
-                    fprintf(arch, "%s\n", etiquetaVerdadero);
+                    fprintf(arch, "%s:\n", etiquetaVerdadero);
                     contFalso++;
                 }
             }
-            printf("\ntengo: %s\n", padre->der->simbolo);
             generar_assembler(&padre->der, arch);
             
             desapilar(&cicloAnidados, etiquetaCiclo, sizeof(etiquetaCiclo));
             fprintf(arch, "BI %s\n", etiquetaCiclo);
            
             desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
-            fprintf(arch, "%s\n", etiquetaFalso);
+            fprintf(arch, "%s:\n", etiquetaFalso);
 
         }
 
@@ -1246,6 +1271,8 @@ void generar_assembler(Arbol* arbol, FILE* arch){
         padre = padreMasIzq(arbol);
     }
     //padre = NULL;
+    
+    
     //fclose(arch);
 
 }
@@ -1317,4 +1344,12 @@ void invertirCondicion(NodoA* padre){
     else if(strcmp(padre->simbolo, "!=") == 0){
         strcpy(padre->simbolo, "==");
     }
+}
+
+void generar_fin(FILE* arch){
+    //fprintf(pf, "\nfin:");
+	fprintf(arch, "\nMOV EAX, 4C00H\n");
+	fprintf(arch, "INT 21h\n");
+	fprintf(arch, "END START");
+
 }

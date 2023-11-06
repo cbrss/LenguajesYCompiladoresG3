@@ -1,8 +1,6 @@
 init {
-    a, b: String
-    c : Int
-   
+    a : String
 }
 
-a = "1"
-c = 1
+
+write("2")

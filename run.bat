@@ -1,15 +1,10 @@
-flex lexico.l
-bison -dyv sintactico.y
+PATH=D:\compilador\LenguajesYCompiladoresG3;
 
-gcc.exe lex.yy.c y.tab.c tab_simb.c arbol.c pila.c cola.c -o lyc-compiler-2.0.0.jar
-
-lyc-compiler-2.0.0.jar casos_de_prueba/testsimple.txt
-
-@echo off
-//del lyc-compiler-2.0.0.jar
-del lex.yy.c
-del y.tab.c
-del y.tab.h
-del y.output
-
-pause
+tasm number.asm
+tasm final.asm
+tlink final.obj number.obj
+final.exe
+del final.obj 
+del number.obj 
+del final.exe
+del final.map

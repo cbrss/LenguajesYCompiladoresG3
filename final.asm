@@ -1,16 +1,16 @@
+include number.asm
+include macros.asm
 .MODEL LARGE
 .386
 .STACK 200h
-INCLUDE number.asm
 .DATA
-c dd ??
-b dd ??
-a dd ??
-_1 dd 1.0
-_1 db "1" , '$', 1 dup (?)
+a dd ?
+_s_2 db "2" , '$', 1 dup (?)
+.CODE
+START:
+displayString _s_2
+newLine 1
 
-FLD "1"
-FSTP a
-FLD _1
-FRNDINT
-FSTP c
+MOV EAX, 4C00H
+INT 21h
+END START

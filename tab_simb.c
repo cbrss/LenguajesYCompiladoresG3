@@ -45,7 +45,7 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
         char nNombre[longitud - 2];
         strncpy(nNombre, nombre + 1, longitud); // saco los "" del string
         nNombre[longitud] = '\0';               // strncpy no mete \0
-        strcpy(nuevo_simbolo.nombre, "_");
+        strcpy(nuevo_simbolo.nombre, "_s_");
         strcat(nuevo_simbolo.nombre, nNombre);
         strcpy(nuevo_simbolo.tipo_dato, TSTRING);
         strcpy(nuevo_simbolo.valor, nNombre);
@@ -200,12 +200,14 @@ char *obtenerTipo(Lista *lista, char *id)
     return NULL;
 }
 
-char *obtenerSinComillas(char* str) 
+void obtenerSinComillas(char* strDest, char* strOri) 
 {
-    int len = strlen(str);
+    int len = strlen(strOri);
     char strCopy[len];
-    strncpy(strCopy, str + 1, len - 2);
-    return strCopy;
+    strncpy(strCopy, strOri + 1, len - 2);
+    strCopy[len - 2] = '\0';
+    strcpy(strDest, strCopy);
+
 }
 
 int listaVacia(Lista* lista)
@@ -236,15 +238,16 @@ void imprimirEncabezado(Lista* lista, int cantAux){
     }
     //number.asm
     
-
-    fprintf(arch, ".MODEL LARGE\n.386\n.STACK 200h\nINCLUDE number.asm\n.DATA\n");
+    fprintf(arch, "include number.asm\n");
+    fprintf(arch, "include macros.asm\n");
+    fprintf(arch, ".MODEL LARGE\n.386\n.STACK 200h\n.DATA\n");
     while (*lista != NULL)
     {
         if (strlen((*lista)->simb.valor) == 0){     // si es ID
-            fprintf(arch, "%s dd ??\n", (*lista)->simb.nombre);
+            fprintf(arch, "%s dd ?\n", (*lista)->simb.nombre);
 
         } else if(strcmp((*lista)->simb.tipo_dato, "Int") == 0 ){
-            fprintf(arch, "%s dd %s.0\n", (*lista)->simb.nombre, (*lista)->simb.valor);
+            fprintf(arch, "%s dd %s.00\n", (*lista)->simb.nombre, (*lista)->simb.valor);
         } else if (strcmp((*lista)->simb.tipo_dato, "Float") == 0){
             fprintf(arch, "%s dd %s\n", (*lista)->simb.nombre, (*lista)->simb.valor);   //si es float
         } else{
@@ -263,7 +266,8 @@ void imprimirEncabezado(Lista* lista, int cantAux){
         }
     }
     
-    fprintf(arch, "\n");
+    fprintf(arch, ".CODE\n");
+    fprintf(arch, "START:\n");
     fclose(arch);
 
 }
