@@ -1,3 +1,10 @@
 nombre                                            |tipoDato|valor                                             |longitud  
-a                                                 |String |                                                  |0         
-_s_2                                              |String |2                                                 |1         
+c                                                 |Int    |                                                  |0         
+b                                                 |Int    |                                                  |0         
+a                                                 |Int    |                                                  |0         
+_2                                                |Int    |2                                                 |1         
+_1                                                |Int    |1                                                 |1         
+_0                                                |Int    |0                                                 |1         
+_-1                                               |Int    |-1                                                |2         
+@auxExp                                           |Float  |                                                  |0         
+@_contI                                           |Int    |                                                  |0         

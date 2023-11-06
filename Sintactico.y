@@ -43,7 +43,7 @@
     NodoA* DecAsigPTr,* DecAsigMPtr,* ParamAsigPtr,* CtePtr, * ParamContPtr;
     char AuxDec[ID_LARGO_MAX + 1];
     NodoA* AuxPtr;
-
+    NodoA * auxCont;
     char  auxTipo[7], strAux[VALOR_LARGO_MAX + 1], strAux2[VALOR_LARGO_MAX + 1], cmpAux[3], opAux[3];
     char strAuxAsig[VALOR_LARGO_MAX + 1];
     char auxValor[VALOR_LARGO_MAX];
@@ -220,14 +220,15 @@ sentencia:
         snprintf(strAux, sizeof(intAux), "%d", intAux);
         SentPtr = crearNodo(
                 "ciclo", 
-                crearNodo("<", crearHoja("@_i"), crearHoja(strAux)),
+                crearNodo("<", crearHoja("@_timerI"), crearHoja(strAux)),
                     crearNodo(
                         "BloEjec", BloPtr, 
-                        crearNodo("BloEjec", crearNodo("=", crearHoja("@_i"), crearHoja("0")),crearNodo("=", crearHoja("@_i"), crearNodo("+", crearHoja("@_i"), crearHoja("1")))
+                        crearNodo("BloEjec", crearNodo("=", crearHoja("@_timerI"), crearHoja("0")),crearNodo("=", crearHoja("@_timerI"), crearNodo("+", crearHoja("@_timerI"), crearHoja("1")))
                 )
             )
         );
-        insertarEnLista(&listaSimbolos, "@_i",  tINT);
+        insertarEnLista(&listaSimbolos, "@_timerI",  tID);
+        asignarTipoDato(&listaSimbolos, "@_timerI", "Int");
         contadorAuxiliares++;
         ;
     }
@@ -257,6 +258,31 @@ sentencia:
         printf("\t\tRespecial1: asigcomp ( [ dec_asig ]) es Sentencia\n");
         SentPtr = DecAsigMPtr;
 
+    }
+    
+    |ID OP_AS CONT PA expresion {auxCont=Eptr;} DOS_P DOS_P CA param_cont_mul CC PC {
+        printf("\t\tRespecial2: !cont(expresion :: [param_cont_mul]) es Sentencia\n");
+        SentPtr = crearNodo("BloEjec", 
+                                ParamContPtr, 
+                                crearNodo("BloEjec", crearHoja("relleno"),
+                                    crearNodo("if",
+                                        crearNodo("==", crearHoja("@_contI"), crearHoja("0")),
+                                        crearNodo("Cuerpo",
+                                            crearNodo("=", crearHoja($1), crearHoja("-1")),
+                                            crearNodo("=", crearHoja($1), crearHoja("@_contI"))
+                                        )
+                                    )
+                                )
+                            );
+       //verificar que ID sea float o int
+        contadorAuxiliares++;
+        insertarEnLista(&listaSimbolos, "1", tINT);
+        insertarEnLista(&listaSimbolos, "0", tINT);
+        insertarEnLista(&listaSimbolos, "-1", tINT);
+        insertarEnLista(&listaSimbolos, "@auxExp", tID);
+        asignarTipoDato(&listaSimbolos, "@auxExp", "Float");
+        insertarEnLista(&listaSimbolos, "@_contI",  tID);
+        asignarTipoDato(&listaSimbolos, "@_contI", "Int");
     }
     ;
 
@@ -312,10 +338,15 @@ param_asig:
 param_cont_mul:
     param_asig  {printf("\t\t\tRx6: param_asig es param_cont_mul\n");
      
-        ParamContPtr = crearNodo("M", ParamContPtr, crearNodo("if", crearNodo("!=", Eptr, ParamAsigPtr), crearNodo("+", crearHoja("_i"), crearHoja("1"))));
+        ParamContPtr = crearNodo("BloEjec", 
+                                        crearNodo("BloEjec", crearNodo("=", crearHoja("@_contI"), crearHoja("0")),crearNodo("=",crearHoja("@auxExp"), auxCont)), 
+                                        crearNodo("if", 
+                                            crearNodo("!=", crearHoja("@auxExp"), ParamAsigPtr), 
+                                            crearNodo("+", crearHoja("@_contI"), crearHoja("1"))));
+        
     }
     | param_cont_mul COMA param_asig {printf("\t\t\tRx6: param_asig , param_asig es param_cont_mul\n");
-        ParamContPtr = crearNodo("M", ParamContPtr, crearNodo("if", crearNodo("!=", Eptr, ParamAsigPtr), crearNodo("+", crearHoja("_i"), crearHoja("1"))));
+        ParamContPtr = crearNodo("BloEjec", ParamContPtr, crearNodo("if", crearNodo("!=", crearHoja("@auxExp"), ParamAsigPtr), crearNodo("+", crearHoja("@_contI"), crearHoja("1"))));
     }
     ; 
 
@@ -457,11 +488,7 @@ expresion:
     termino                     { printf("\t\t\t\tR42: Termino es Expresion\n"); Eptr = Tptr; contadorAuxiliares++;}
     |expresion OP_SUM termino   { printf("\t\t\t\tR43: Expresion+Termino es Expresion\n"); Eptr = crearNodo("+", Eptr, Tptr); contadorAuxiliares++;}
     |expresion OP_RES termino   { printf("\t\t\t\tR44: Expresion-Termino es Expresion\n"); Eptr = crearNodo("-", Eptr, Tptr); contadorAuxiliares++;}
-    |CONT PA expresion DOS_P DOS_P CA param_cont_mul CC PC {
-        printf("\t\tRespecial2: !cont(expresion :: [param_cont_mul]) es Expresion\n");
-        Eptr = crearNodo("if",crearNodo("==",ParamContPtr, crearHoja("0")), crearNodo("=", crearHoja("_i"), crearHoja("-1")));
-        contadorAuxiliares++;
-    }
+    
     ;
  
 termino:
@@ -586,7 +613,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
     NodoA* bloque;
     
     while(padre!= NULL){
-        //printf("\n*%s*\n", padre->simbolo);
+        printf("\n*%s*\n", padre->simbolo);
 
         if(strcmp(padre->simbolo, "BloEjec") == 0){
             generar_assembler(&padre->der,arch);
@@ -623,14 +650,19 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                 fprintf(arch, "FLD %s\n", padre->izq->simbolo);
                 fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FADD\n");
-        
-                fprintf(arch, "FSTP @aux%d\n", contOp);
+                if(strcmp(padre->izq->simbolo, "@_contI") == 0){
+                    fprintf(arch, "FSTP @_contI\n");
 
-                strcpy(auxAsm, "@aux");
-                itoa(contOp, auxAsmOp, 10);
-                strcat(auxAsm, auxAsmOp);
+                } else{
+                    fprintf(arch, "FSTP @aux%d\n", contOp);
 
-                strcpy(padre->simbolo, auxAsm);
+                    strcpy(auxAsm, "@aux");
+                    itoa(contOp, auxAsmOp, 10);
+                    strcat(auxAsm, auxAsmOp);
+
+                    strcpy(padre->simbolo, auxAsm);
+                }
+                
             }
             else if(strcmp(padre->simbolo, "-") == 0){
                 fprintf(arch, "FLD %s\n", padre->izq->simbolo);
@@ -950,7 +982,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
             }
 
             if(strcmp(padre->der->simbolo, "Cuerpo") == 0){ //if con else
-                
+
                 if(operadorOr == 1){    //si op logico es OR || 
                     generar_assembler(&padre->der->izq, arch);  //true
                     strcpy(etiquetaVerdadero, "verdadero");
@@ -974,6 +1006,7 @@ void generar_assembler(Arbol* arbol, FILE* arch){
                     
                     operadorOr = 0;
                 } else{                 // cualquier otro caso
+                                    
                     generar_assembler(&padre->der->izq, arch);  //true
                     strcpy(etiquetaVerdadero, "verdadero");
                     itoa(contVerdadero, nro, 10);

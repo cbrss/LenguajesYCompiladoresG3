@@ -260,9 +260,17 @@ void imprimirEncabezado(Lista* lista, int cantAux){
     int i = 1;
     if(cantAux != -1){
         while(cantAux != 0){
-            fprintf(arch, "@aux%d dd ??\n",i);
+            char auxiliar[ID_LARGO_MAX];
+            char numero[ID_LARGO_MAX];
+
+            strcpy(auxiliar, "@aux");
+            itoa(i, numero, 10);
+            strcat(auxiliar, numero);
+            fprintf(arch, "%s dd ??\n",auxiliar);
             i++;
             cantAux--;
+
+            insertarEnLista(lista, auxiliar, tID);
         }
     }
     

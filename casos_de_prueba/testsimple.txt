@@ -1,6 +1,6 @@
 init {
-    a : String
+    a, b, c : Int
 }
 
 
-write("2")
+c = !cont(2 :: [a])
