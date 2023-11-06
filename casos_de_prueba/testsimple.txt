@@ -1,9 +1,6 @@
 init {
-    a, b, c, d: Int
-    e,f,g,h : Int
-    pepe : String
+    a, b: Int
+   
 }
 
-if(estaContenido("avc", "t")) {
-    write("a")
-}
+

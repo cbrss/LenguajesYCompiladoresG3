@@ -3,18 +3,22 @@
 .STACK 200h
 .DATA
 
-pepe dd ??
-h dd ??
-g dd ??
-f dd ??
-e dd ??
-d dd ??
-c dd ??
 b dd ??
 a dd ??
-_t db "t" , '$', 1 dup (?)
-_avc db "avc" , '$', 3 dup (?)
-_a db "a" , '$', 1 dup (?)
+_3 dd 3.0
+_2 dd 2.0
+_1 dd 1.0
+@aux1 dd ??
+@aux2 dd ??
 
-displayString _a
-
+FLD _1
+FLD _2
+FADD
+FSTP @aux1
+FLD @aux1
+FLD _3
+FADD
+FSTP @aux2
+FLD @aux2
+FRNDINT
+FSTP a

@@ -464,7 +464,7 @@ factor:
         Fptr= crearHoja($1); 
     }
     |INT   { 
-        printf("\t\t\t\t    R51: INT es Factor\n"); 
+        printf("\t\t\t\t    R51: INT es Factor %d\n", $1); 
         snprintf(strAux, sizeof($1), "_%d", $1);
         strcpy(auxTipo, TINT);
         Fptr= crearHoja(strAux); 
@@ -576,7 +576,16 @@ void generar_assembler(Arbol* arbol, FILE* arch){
             
             //posiblemente haya que preguntar, si der es string haya que hacer otra cosa
             generar_assembler(&padre->der, arch);
-            fprintf(arch, "FLD %s\n", padre->der->simbolo);
+            if(strcmp(auxTipo, "String") == 0){
+                // quitar " " de padre->der->simbolo
+                // buscar por valor y traer nombre
+                // tener en cuenta el tipo de dato
+
+                fprintf(arch, "FLD %s\n", padre->der->simbolo);
+
+            } else{
+                fprintf(arch, "FLD %s\n", padre->der->simbolo);
+            }
             if(strcmp(auxTipo, "Int") == 0){
                 fprintf(arch, "FRNDINT\n");
             } 
@@ -589,7 +598,10 @@ void generar_assembler(Arbol* arbol, FILE* arch){
         }
         if(esOperacionAritmetica(padre->simbolo)  == 1){
 
+            //generar_assembler(&padre->izq, arch);
+            generar_assembler(&padre->der, arch);
             if(strcmp(padre->simbolo, "+") == 0){
+                
                 fprintf(arch, "FLD %s\n", padre->izq->simbolo);
                 fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FADD\n");

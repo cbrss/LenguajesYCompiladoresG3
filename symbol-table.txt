@@ -1,13 +1,6 @@
 nombre                                            |tipoDato|valor                                             |longitud  
-pepe                                              |String |                                                  |0         
-h                                                 |Int    |                                                  |0         
-g                                                 |Int    |                                                  |0         
-f                                                 |Int    |                                                  |0         
-e                                                 |Int    |                                                  |0         
-d                                                 |Int    |                                                  |0         
-c                                                 |Int    |                                                  |0         
 b                                                 |Int    |                                                  |0         
 a                                                 |Int    |                                                  |0         
-_t                                                |String |t                                                 |1         
-_avc                                              |String |avc                                               |3         
-_a                                                |String |a                                                 |1         
+_3                                                |Int    |3                                                 |1         
+_2                                                |Int    |2                                                 |1         
+_1                                                |Int    |1                                                 |1         
