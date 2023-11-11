@@ -4,7 +4,7 @@
     #include <string.h>
     #include <math.h>
 
-    #include "tab_simb.h"
+    #include "include/tab_simb.h"
     #include "y.tab.h"
     
     FILE* yyin;

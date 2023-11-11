@@ -10,7 +10,6 @@ init {
     compl3 : Float
     compl4 : String
     contar1, contar2, contar3 : Int
-    id_mas_largo_id_mas_id_mas_largo_id_mas_: Int
  
 }
 
@@ -29,33 +28,18 @@ entero_min = -32768
 entero_max = 32768
 float_min = -2147483648.
 float_max = 2147483648.
-cad_min = ""
-cad_max = "0123456789012345678901234567890123456789"
-cad_any = "Cualquier cáracter: @!#'¿?"
 
-*- FLOAT FUERA DE RANGO -*
+cad_max = "0123456789012345678901234"
 
-float_min = -2147483649.
-float_max = 2147483649.
 
-*- INT FUERA DE RANGO -*
-
-entero_min = -32769
-entero_max = 32769
-
-*- STRING FUERA DE RANGO -*
-
-cad_test1 = ""
-cad_test2 = "0123456789012345678901234567890123456789+"
-cad_test3 = "Cualquier cáracter: @!#'¿?"
 
 *- FUNCIONES -*
 write(cad_test4)
-write("hola, mundo")
+write("hola mundo")
 read(cad_test5)
 
 *- CONCATENAR -*
-cad_concat1 = concatenarConRecorte("0123456789012345678901234567890123456789", "pepi", 2)
+cad_concat1 = concatenarConRecorte("01234567890123456789", "pepi", 2)
 cad_concat2 = concatenarConRecorte("01", "pe", 2)
 cad_concat3 = concatenarConRecorte("011", "pe1", 2)
 

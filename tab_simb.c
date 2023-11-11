@@ -1,4 +1,4 @@
-#include "tab_simb.h"
+#include "./include/tab_simb.h"
 void sacarEspacios(char *str);
 
 Lista crearLista(Lista *pl)
@@ -18,6 +18,7 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
     if (tDato == tID)
     {
         strcpy(nuevo_simbolo.nombre, nombre);
+        strcpy(nuevo_simbolo.tipo_dato, "Id");
     }
     else if (tDato == tINT)
     {
@@ -117,7 +118,7 @@ int idDeclarado(Lista *lista, char *id)
     {
         lista = &(*lista)->sig;
     }
-    if (*lista != NULL && strcmp((*lista)->simb.nombre, id) == 0 && !strlen((*lista)->simb.tipo_dato))
+    if (*lista != NULL && strcmp((*lista)->simb.nombre, id) == 0 && strcmp((*lista)->simb.tipo_dato, "Id") == 0)
     {
         return FALSE;
     }

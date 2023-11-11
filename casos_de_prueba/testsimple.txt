@@ -1,6 +1,21 @@
 init {
-    a, b, c : Int
+   a,b, c, contar1, contar2, contar3, entero_min: Int *- Multiples variables -*
+    
+    cad_test1: String
+  
+    compl1, compl2 : Int
+    compl3 : Float
+    compl4 : String
+
 }
 
 
-AsigComp([a, b, c] : [1, 2, 3])
+
+a = 2
+
+
+
+*- Asignacion compleja -*
+
+AsigComp([compl1] : [1])
+

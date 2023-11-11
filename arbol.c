@@ -1,5 +1,6 @@
-#include "arbol.h"
+#include "include/arbol.h"
 int esComparadorArbol(char* op);
+void limpiarComillas(char* dest, char* ori);
 
 void crearArbol(Arbol *pa)
 {
@@ -16,7 +17,9 @@ NodoA *crearNodo(char *simb, NodoA *hIzq, NodoA *hDer)
     nuevo->der = hDer;
     nuevo->izq = hIzq;
     strcpy(nuevo->simbolo, simb);
+    nuevo->nro = contadorArbolInd;
 
+    contadorArbolInd++;
     return nuevo;
 }
 
@@ -27,28 +30,103 @@ NodoA *crearHoja(char *simb)
 
 void imprimirArbol(Arbol *pa)
 {
+    FILE *arch = fopen("intermediate-code.dot", "w");
+    if (!arch)
+    {
+        printf("No se pudo abrir el archivo para escritura\n");
+        return;
+    }
+    fprintf(arch, "digraph G{\n");
+
+    recorrerArbolInOrden(pa, arch);
+    fprintf(arch, "}\n");
+    fclose(arch);
+}
+
+void recorrerArbolInOrden(Arbol *pa, FILE *arch)
+{
+    static int contador = 0;
+    
+    if (!*pa )
+        return;
+    char strCopy[100];
+    
+    if((*pa)->simbolo[0] == '"'){
+        limpiarComillas(strCopy, (*pa)->simbolo);
+
+        fprintf(arch, "\"nodo%d\"[ label=\"\\\"%s\\\"\"];\n", (*pa)->nro, strCopy);    //si es un string literal tiene comilllas
+    } else{
+        fprintf(arch, "\"nodo%d\"[ label=\"%s\"];\n", (*pa)->nro, (*pa)->simbolo);
+    }
+        
+    if ((*pa)->izq != NULL ) {
+    
+        if((*pa)->izq->simbolo[0] == '"'){
+            
+            limpiarComillas(strCopy, (*pa)->der->simbolo);
+            fprintf(arch, "\"nodo%d\"[ label=\"\\\"%s\\\"\"];\n", (*pa)->izq->nro, strCopy);    //si es un string literal tiene comilllas
+        }
+        else {
+            fprintf(arch, "\"nodo%d\"[ label=\"%s\"];\n", (*pa)->izq->nro, (*pa)->izq->simbolo);
+        }
+        fprintf(arch, "nodo%d -> nodo%d\n", (*pa)->nro, (*pa)->izq->nro);   //creo una arista entre los nodos padre e hijo
+
+        recorrerArbolInOrden(&(*pa)->izq, arch);
+    }
+    if ((*pa)->der != NULL ) {
+
+        if((*pa)->der->simbolo[0] == '"'){
+            limpiarComillas(strCopy, (*pa)->der->simbolo);
+            fprintf(arch, "\"nodo%d\"[ label=\"\\\"%s\\\"\"];\n", (*pa)->der->nro, strCopy); //si es un string literal tiene comilllas
+        }
+        else {
+            fprintf(arch, "\"nodo%d\"[ label=\"%s\"];\n", (*pa)->der->nro, (*pa)->der->simbolo); 
+        }
+        fprintf(arch, "nodo%d -> nodo%d\n", (*pa)->nro, (*pa)->der->nro);
+    
+        recorrerArbolInOrden(&(*pa)->der, arch);
+    }
+}
+
+void limpiarComillas(char* dest, char* ori){
+    int len = strlen(ori);
+    char strCopy[len];
+    strncpy(strCopy, ori + 1, len - 2);
+    strCopy[len - 2] = '\0';
+    strcpy(dest, strCopy);
+
+}
+
+void imprimirArbol2(Arbol *pa)
+{
     FILE *arch = fopen("intermediate-code.txt", "w");
     if (!arch)
     {
         printf("No se pudo abrir el archivo para escritura\n");
         return;
     }
-    recorrerArbolInOrden(pa, 0, arch);
+    recorrerArbolInOrden2(pa, 0, arch);
     fclose(arch);
 }
 
-void recorrerArbolInOrden(Arbol *pa, int nivel, FILE *arch)
+void recorrerArbolInOrden2(Arbol *pa, int nivel, FILE *arch)
 {
     if (!*pa)
         return;
-    recorrerArbolInOrden(&(*pa)->izq, nivel + 1, arch);
+    recorrerArbolInOrden2(&(*pa)->izq, nivel + 1, arch);
    
     for (int i = 0; i < nivel; i++)
         fprintf(arch, "\t");
     fprintf(arch, "%s\n", &(*pa)->simbolo);
 
-    recorrerArbolInOrden(&(*pa)->der, nivel + 1, arch);
+    recorrerArbolInOrden2(&(*pa)->der, nivel + 1, arch);
 }
+
+
+
+
+
+
 void recorrerArbolInOrdenOUT(Arbol *pa)
 {
     if (!*pa)

@@ -1,11 +1,11 @@
 %{ 
     //borrar nodos declaracion
-    #include "constantes.h"
-    #include "tab_simb.h"
+    #include "include/constantes.h"
+    #include "include/tab_simb.h"
     #include "y.tab.h"
-    #include "arbol.h"
-    #include "pila.h"
-    #include "cola.h"
+    #include "include/arbol.h"
+    #include "include/pila.h"
+    #include "include/cola.h"
 
     int yystopparser=0;
     extern FILE* yyin;
@@ -132,12 +132,14 @@ programa_prima:
     programa    { compilado = ProgramaPtr;
                  if(boolCompiladoOK == 1){
                     printf("R1: COMPILACION EXITOSA\n");
+                    imprimirArbol2(&compilado);
                     imprimirArbol(&compilado);
-                    imprimirEncabezado(&listaSimbolos, cantidadAuxiliares - 1);
+                    
+                    /*imprimirEncabezado(&listaSimbolos, cantidadAuxiliares - 1);
                     FILE *arch = fopen("final.asm", "a");
                     generar_assembler(&compilado, arch);
                     generar_fin(arch);
-                    fclose(arch);
+                    fclose(arch);*/
                 }
                 else{
                     printf("R1: ERROR DE COMPILACION\n");
@@ -262,9 +264,10 @@ sentencia:
     
     |ID OP_AS CONT PA expresion {auxCont=Eptr;} DOS_P DOS_P CA param_cont_mul CC PC {
         printf("\t\tRespecial2: !cont(expresion :: [param_cont_mul]) es Sentencia\n");
+
+        //270 talvez sacarlo y meter en "bloqueEjec" el if
         SentPtr = crearNodo("BloEjec", 
                                 ParamContPtr, 
-                                crearNodo("BloEjec", crearHoja("relleno"),
                                     crearNodo("if",
                                         crearNodo("==", crearHoja("@_contI"), crearHoja("0")),
                                         crearNodo("Cuerpo",
@@ -272,7 +275,7 @@ sentencia:
                                             crearNodo("=", crearHoja($1), crearHoja("@_contI"))
                                         )
                                     )
-                                )
+                                
                             );
        //verificar que ID sea float o int
         contadorAuxiliares++;

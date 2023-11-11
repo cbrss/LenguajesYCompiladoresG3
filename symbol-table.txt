@@ -1,7 +1,15 @@
 nombre                                            |tipoDato|valor                                             |longitud  
+entero_min                                        |Int    |                                                  |0         
+contar3                                           |Int    |                                                  |0         
+contar2                                           |Int    |                                                  |0         
+contar1                                           |Int    |                                                  |0         
+compl4                                            |String |                                                  |0         
+compl3                                            |Float  |                                                  |0         
+compl2                                            |Int    |                                                  |0         
+compl1                                            |Int    |                                                  |0         
+cad_test1                                         |String |                                                  |0         
 c                                                 |Int    |                                                  |0         
 b                                                 |Int    |                                                  |0         
 a                                                 |Int    |                                                  |0         
-_3                                                |Int    |3                                                 |1         
 _2                                                |Int    |2                                                 |1         
 _1                                                |Int    |1                                                 |1         
