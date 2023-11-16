@@ -1,4 +1,4 @@
-#include "include/arbol.h"
+#include "../include/arbol.h"
 int esComparadorArbol(char* op);
 void limpiarComillas(char* dest, char* ori);
 
@@ -28,7 +28,7 @@ NodoA *crearHoja(char *simb)
     return crearNodo(simb, NULL, NULL);
 }
 
-void imprimirArbol(Arbol *pa)
+void imprimirArbolGrafico(Arbol *pa)
 {
     FILE *arch = fopen("intermediate-code.dot", "w");
     if (!arch)
@@ -38,12 +38,12 @@ void imprimirArbol(Arbol *pa)
     }
     fprintf(arch, "digraph G{\n");
 
-    recorrerArbolInOrden(pa, arch);
+    recorrerArbolInOrdenGrafico(pa, arch);
     fprintf(arch, "}\n");
     fclose(arch);
 }
 
-void recorrerArbolInOrden(Arbol *pa, FILE *arch)
+void recorrerArbolInOrdenGrafico(Arbol *pa, FILE *arch)
 {
     static int contador = 0;
     
@@ -71,7 +71,7 @@ void recorrerArbolInOrden(Arbol *pa, FILE *arch)
         }
         fprintf(arch, "nodo%d -> nodo%d\n", (*pa)->nro, (*pa)->izq->nro);   //creo una arista entre los nodos padre e hijo
 
-        recorrerArbolInOrden(&(*pa)->izq, arch);
+        recorrerArbolInOrdenGrafico(&(*pa)->izq, arch);
     }
     if ((*pa)->der != NULL ) {
 
@@ -84,7 +84,7 @@ void recorrerArbolInOrden(Arbol *pa, FILE *arch)
         }
         fprintf(arch, "nodo%d -> nodo%d\n", (*pa)->nro, (*pa)->der->nro);
     
-        recorrerArbolInOrden(&(*pa)->der, arch);
+        recorrerArbolInOrdenGrafico(&(*pa)->der, arch);
     }
 }
 
@@ -97,7 +97,7 @@ void limpiarComillas(char* dest, char* ori){
 
 }
 
-void imprimirArbol2(Arbol *pa)
+void imprimirArbolTexto(Arbol *pa)
 {
     FILE *arch = fopen("intermediate-code.txt", "w");
     if (!arch)
@@ -105,27 +105,22 @@ void imprimirArbol2(Arbol *pa)
         printf("No se pudo abrir el archivo para escritura\n");
         return;
     }
-    recorrerArbolInOrden2(pa, 0, arch);
+    recorrerArbolInOrdenTexto(pa, 0, arch);
     fclose(arch);
 }
 
-void recorrerArbolInOrden2(Arbol *pa, int nivel, FILE *arch)
+void recorrerArbolInOrdenTexto(Arbol *pa, int nivel, FILE *arch)
 {
     if (!*pa)
         return;
-    recorrerArbolInOrden2(&(*pa)->izq, nivel + 1, arch);
+    recorrerArbolInOrdenTexto(&(*pa)->izq, nivel + 1, arch);
    
     for (int i = 0; i < nivel; i++)
         fprintf(arch, "\t");
     fprintf(arch, "%s\n", &(*pa)->simbolo);
 
-    recorrerArbolInOrden2(&(*pa)->der, nivel + 1, arch);
+    recorrerArbolInOrdenTexto(&(*pa)->der, nivel + 1, arch);
 }
-
-
-
-
-
 
 void recorrerArbolInOrdenOUT(Arbol *pa)
 {

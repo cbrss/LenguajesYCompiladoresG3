@@ -1,0 +1,24 @@
+digraph G{
+"nodo11"[ label="Programa"];
+"nodo10"[ label="BloEjec"];
+nodo11 -> nodo10
+"nodo10"[ label="BloEjec"];
+"nodo6"[ label="="];
+nodo10 -> nodo6
+"nodo6"[ label="="];
+"nodo5"[ label="a"];
+nodo6 -> nodo5
+"nodo5"[ label="a"];
+"nodo4"[ label="\"asd\""];
+nodo6 -> nodo4
+"nodo4"[ label="\"asd\""];
+"nodo9"[ label="Write"];
+nodo10 -> nodo9
+"nodo9"[ label="Write"];
+"nodo8"[ label="a"];
+nodo9 -> nodo8
+"nodo8"[ label="a"];
+"nodo7"[ label="String"];
+nodo9 -> nodo7
+"nodo7"[ label="String"];
+}

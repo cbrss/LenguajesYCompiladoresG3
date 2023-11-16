@@ -1,0 +1,7 @@
+init {
+    a: String
+}
+
+a = "asd"
+
+write(a)

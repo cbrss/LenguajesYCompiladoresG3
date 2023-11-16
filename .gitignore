@@ -70,3 +70,4 @@ compilador
 # Archivos temporales
 intermediate-code.txt
 symbol-table.txt
+final.asm

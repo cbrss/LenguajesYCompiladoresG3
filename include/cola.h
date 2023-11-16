@@ -1,3 +1,5 @@
+#ifndef _COLAH_
+#define _COLAH_
 #include <stddef.h>
 
 typedef struct SNodo
@@ -21,3 +23,5 @@ int verFrenteDeCola(const Cola* pc, void* dato, size_t tamElem);
 int colaVacia(const Cola* pc);
 int colaLlena(const Cola* pc, size_t tamElem);
 void vaciarCola(Cola* pc);
+
+#endif

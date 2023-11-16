@@ -1,3 +1,6 @@
+#ifndef _TAB_SIMBH_
+#define _TAB_SIMBH_
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -43,3 +46,5 @@ int listaVacia(Lista *);
 int eliminarDeLista(Lista* lista, char* id);
 void imprimirEncabezado(Lista* lista, int cantAux);
 char* obtenerNombre(Lista *lista, char* valor, char* tDato);
+
+#endif

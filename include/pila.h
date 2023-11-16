@@ -1,3 +1,6 @@
+#ifndef _PILAH_
+#define _PILAH_
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -26,3 +29,5 @@ int pilaLLena(Pila* pp, size_t tam_el);
 int pilaVacia(Pila* pp);
  
 void vaciarPila(Pila* pp);
+
+#endif

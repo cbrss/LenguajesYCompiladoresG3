@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <memory.h>
 
-#include "include/cola.h"
+#include "../include/cola.h"
 
 #define min(a, b) ((a)<(b)? (a) : (b))
 

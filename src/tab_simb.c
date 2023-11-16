@@ -1,4 +1,4 @@
-#include "./include/tab_simb.h"
+#include "../include/tab_simb.h"
 void sacarEspacios(char *str);
 
 Lista crearLista(Lista *pl)
