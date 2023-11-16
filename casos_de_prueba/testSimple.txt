@@ -1,7 +1,11 @@
 init {
-    a: String
+    a, b: Int
 }
 
-a = "asd"
+if( a < b || b < a){
+    a = 2
+}
 
-write(a)
+if(a == b){
+    a = 3
+}
