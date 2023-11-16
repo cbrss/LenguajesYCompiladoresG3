@@ -1,3 +1,0 @@
-nombre                                            |tipoDato|valor                                             |longitud  
-a                                                 |String |                                                  |0         
-_s_asd                                            |String |asd                                               |3         

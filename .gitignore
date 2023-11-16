@@ -71,3 +71,5 @@ compilador
 intermediate-code.txt
 symbol-table.txt
 final.asm
+intermediate-code.dot
+arbol.png
