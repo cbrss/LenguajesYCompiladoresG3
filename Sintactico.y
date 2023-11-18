@@ -500,13 +500,14 @@ factor:
     }
     |INT   { 
         printf("\t\t\t\t    R51: INT es Factor %d\n", $1); 
-        snprintf(strAux, sizeof($1), "_%d", $1);
+        snprintf(strAux, VALOR_LARGO_MAX, "_%d", $1);
         strcpy(auxTipo, TINT);
         Fptr= crearHoja(strAux); 
     }
     |FLOAT { 
         printf("\t\t\t\t    R52: FLOAT es Factor\n"); 
-        snprintf(strAux, MIN(sizeof($1), VALOR_LARGO_MAX), "_%.2f", $1);
+        snprintf(strAux, VALOR_LARGO_MAX, "_%.2f", $1);
+      
         strcpy(auxTipo, TFLOAT);
         Fptr= crearHoja(strAux);
     }

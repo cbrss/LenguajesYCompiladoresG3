@@ -1,5 +1,6 @@
 #include "../include/tab_simb.h"
 void sacarEspacios(char *str);
+void sacarPuntos(char* str);
 
 Lista crearLista(Lista *pl)
 {
@@ -30,11 +31,16 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
     }
     else if (tDato == tFLOAT)
     {
+        char strAux[STRING_LARGO_MAX];
+
         strcpy(nuevo_simbolo.nombre, "_");
-        strcat(nuevo_simbolo.nombre, nombre);
+        snprintf(strAux, STRING_LARGO_MAX, "%.2f", nombre);
+        strcat(nuevo_simbolo.nombre, strAux);
         strcpy(nuevo_simbolo.tipo_dato, TFLOAT);
         strcpy(nuevo_simbolo.valor, nombre);
         nuevo_simbolo.longitud = strlen(nombre);
+        
+        sacarPuntos(nuevo_simbolo.nombre);
     }
     else if (tDato == tSTRING)
     {
@@ -77,6 +83,12 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
 void sacarEspacios(char *str) {
     for(int i = 0; str[i]; i++){
         if(str[i] == ' ')
+            str[i] = '_';
+    }
+}
+void sacarPuntos(char *str) {
+    for(int i = 0; str[i]; i++){
+        if(str[i] == '.')
             str[i] = '_';
     }
 }
@@ -239,8 +251,8 @@ void imprimirEncabezado(Lista* lista, int cantAux){
     }
     //number.asm
     
-    fprintf(arch, "include number.asm\n");
-    fprintf(arch, "include macros.asm\n");
+    fprintf(arch, "include ./asm/number.asm\n");
+    fprintf(arch, "include ./asm/macros.asm\n");
     fprintf(arch, ".MODEL LARGE\n.386\n.STACK 200h\n.DATA\n");
     while (*lista != NULL)
     {
@@ -267,7 +279,7 @@ void imprimirEncabezado(Lista* lista, int cantAux){
             strcpy(auxiliar, "@aux");
             itoa(i, numero, 10);
             strcat(auxiliar, numero);
-            fprintf(arch, "%s dd ??\n",auxiliar);
+            fprintf(arch, "%s dd ?\n",auxiliar);
             i++;
             cantAux--;
 
@@ -277,6 +289,9 @@ void imprimirEncabezado(Lista* lista, int cantAux){
     
     fprintf(arch, ".CODE\n");
     fprintf(arch, "START:\n");
+    fprintf(arch, "mov AX, @DATA\n");
+    fprintf(arch, "mov DS, AX\n");
+    fprintf(arch, "mov es, ax\n");
     fclose(arch);
 
 }

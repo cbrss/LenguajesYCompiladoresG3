@@ -18,8 +18,7 @@ char nro[100];
 int operadorOr = 0;
 Pila ifFalso, ifVerdadero, ifOr, cicloAnidados;
 void generarCodigoComparador(FILE *arch, NodoA *padre, int nro, char *etiquetaFalso);
-void imprimirEncabezado(Lista *listaSimbolos, int cantidadAuxiliares);
-
+void sacarPunto(char* str);
 void incializarPilas()
 {
     crearPila(&ifFalso);
@@ -70,11 +69,13 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             }
             else if (strcmp(auxTipo, "Float") == 0)
             {
+                sacarPunto(padre->der->simbolo);
                 fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FSTP %s\n", padre->izq->simbolo);
             }
             else if (strcmp(auxTipo, "Int") == 0)
             {
+                fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FRNDINT\n");
                 fprintf(arch, "FSTP %s\n", padre->izq->simbolo);
             }
@@ -486,4 +487,11 @@ int esOperadorLogico(char *op)
         return 1;
 
     return 0;
+}
+
+void sacarPunto(char *str) {
+    for(int i = 0; str[i]; i++){
+        if(str[i] == '.')
+            str[i] = '_';
+    }
 }

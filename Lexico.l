@@ -16,6 +16,7 @@
     int fa_verificarRangoInt(char*);
     int fa_verificarRangoFloat(char*);
     int fa_verificarRangoStr(char*);
+    char strAux[STRING_LARGO_MAX];
 
 %}
 
@@ -93,7 +94,8 @@ MENOR_IGUAL "<="
                     yylval.int_val = atoi(yytext); return INT;}
 
 {FLOAT}         {   if (fa_verificarRangoFloat(yytext) == TRUE){
-                        insertarEnLista(&listaSimbolos, yytext, tFLOAT);
+                       
+                        insertarEnLista(&listaSimbolos, strAux, tFLOAT);
                     }; 
                     
                     yylval.float_val = atof(yytext); return FLOAT;}
