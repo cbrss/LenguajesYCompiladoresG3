@@ -1,6 +1,6 @@
 init {
-  
+  a,b : Int
 }
 
 
-timer(5, write("Hello World"))
+AsigComp([a, b] : [b, 1]) // a=1, b=b, c=2.5, d=z

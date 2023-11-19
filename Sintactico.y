@@ -121,6 +121,7 @@ programa_prima:
                     generar_assembler(&compilado, arch);
                     generar_fin(arch);
                     fclose(arch);*/
+              
                     generarAssembler(&listaSimbolos, &compilado, cantidadAuxiliares - 1);
 
                 }
@@ -212,9 +213,12 @@ sentencia:
                 )
             )
         );
+        
         insertarEnLista(&listaSimbolos, "@_timerI",  tID);
         asignarTipoDato(&listaSimbolos, "@_timerI", "Int");
         contadorAuxiliares++;
+        contadorAuxiliares++;
+        maximo();
         ;
     }
     |WRITE PA ID PC { 
@@ -275,15 +279,16 @@ sentencia:
 
 
 dec_asig_mul: 
-    ID {encolar(&colaIds, $1, STRING_LARGO_MAX + 1);} CC DOS_P CA param_asig {
+    ID {encolar(&colaIds, $1, STRING_LARGO_MAX + 1); printf("Encolando: %s", $1);} CC DOS_P CA param_asig {
         printf("\t\t\tRx3: ] : [ es cierre de Dec_asig_mul\n");
 
         desencolar(&colaIds, strAux, STRING_LARGO_MAX + 1);
+        printf("desencolando: %s\n", strAux);
         if(!idDeclarado(&listaSimbolos, strAux)){ 
             printf("\nError, id: *%s* no fue declarado\n", $1);
             return 1;
         };
-        
+        printf("\nse asigna: %s a %s\n ", strAux, strAuxAsig);
         if(!esMismoTipo(&listaSimbolos, strAux, strAuxAsig)){ 
             printf("\nError, datos de diferente tipo.\n");
             return 1;
@@ -338,12 +343,12 @@ param_cont_mul:
 
 cte: 
     INT {printf("\t\t\t  Rx4: int es Cte\n"); 
-        snprintf(strAux, sizeof($1), "%d", $1);
+        snprintf(strAux, sizeof($1), "_%d", $1);
         CtePtr = crearHoja(strAux);
         strcpy(strAuxAsig, "Int");
     }
     | FLOAT  {printf("\t\t\t  Rx5: float es Cte\n");
-        snprintf(strAux, MIN(sizeof($1), VALOR_LARGO_MAX), "%.2f", $1);
+        snprintf(strAux, MIN(sizeof($1), VALOR_LARGO_MAX), "_%.2f", $1);
         CtePtr = crearHoja(strAux);
         strcpy(strAuxAsig, "Float");
     }
@@ -586,6 +591,7 @@ int estaContenido(char* str1, char* str2){
     return strstr(aux1, aux2) != NULL;
 }
 void maximo(){
+    
     if(contadorAuxiliares > cantidadAuxiliares){
         cantidadAuxiliares = contadorAuxiliares;
     }
