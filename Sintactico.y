@@ -288,7 +288,7 @@ dec_asig_mul:
             printf("\nError, id: *%s* no fue declarado\n", $1);
             return 1;
         };
-        printf("\nse asigna: %s a %s\n ", strAux, strAuxAsig);
+        printf("\nse asigna: *%s* a *%s*\n ", strAux, strAuxAsig);
         if(!esMismoTipo(&listaSimbolos, strAux, strAuxAsig)){ 
             printf("\nError, datos de diferente tipo.\n");
             return 1;
@@ -318,7 +318,13 @@ param_asig:
                 printf("\nError, id: *%s* no fue declarado\n", $1);
                 return 1;
         };
+        //necesito auxtipo de $1
+     
+        
+        strcpy(strAuxAsig, obtenerTipo(&listaSimbolos, $1));
+
         ParamAsigPtr = crearHoja($1);
+        
     }
     | cte {printf("\t\t\t Rx4: cte es Param_asig\n");
         ParamAsigPtr = CtePtr;

@@ -1,6 +1,10 @@
 init {
   a,b : Int
 }
+a = 2
+b = 3
 
+AsigComp([a, b] : [b , 1]) 
 
-AsigComp([a, b] : [b, 1]) // a=1, b=b, c=2.5, d=z
+write(a)
+write(b)

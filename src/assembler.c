@@ -55,6 +55,9 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
         {
             generarCodigo(arch, listaSimbolos, &padre->der);
         }
+        if (strcmp(padre->simbolo, "decAsigM") == 0){
+            generarCodigo(arch, listaSimbolos, &padre->der);
+        }
 
         if (strcmp(padre->simbolo, "=") == 0)
         {
