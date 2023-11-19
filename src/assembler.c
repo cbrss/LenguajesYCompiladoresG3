@@ -183,7 +183,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
         {
             if (strcmp(padre->der->simbolo, "Int") == 0)
             {
-                fprintf(arch, "getInteger %s\n", padre->izq->simbolo);
+                fprintf(arch, "getFloat %s\n", padre->izq->simbolo);
             }
             else if (strcmp(padre->der->simbolo, "Float") == 0)
             {
@@ -230,15 +230,20 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                 {
                     invertirCondicion(opLogico->izq);
 
-                    strcpy(etiquetaFalso, "falso");
-                    generarCodigoComparador(arch, opLogico->izq, contFalso, etiquetaFalso);
-                    contFalso++;
-
+                    strcpy(etiquetaVerdadero, "verdadero");
+                    generarCodigoComparador(arch, opLogico->izq, contVerdadero, etiquetaVerdadero);
+                    contVerdadero++;
+                    apilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
                     // 2da condicion ///ETIQUETA OR
 
                     strcpy(etiquetaOr, "etiquetaOr");
                     generarCodigoComparador(arch, opLogico->der, contOr, etiquetaOr);
                     contOr++;
+                    if(existeElse == 1){
+                        desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
+                        fprintf(arch, "%s:\n", etiquetaVerdadero);
+                        existeElse = 0;
+                    }
 
                     apilar(&ifOr, etiquetaOr, sizeof(etiquetaOr));
                     operadorOr = 1;
@@ -257,7 +262,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
                     contVerdadero++;
                     apilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
-                    fprintf(arch, "BI %s\n", etiquetaVerdadero);
+                    fprintf(arch, "JMP %s\n", etiquetaVerdadero);
 
                     desapilar(&ifOr, etiquetaOr, sizeof(etiquetaOr));
                     fprintf(arch, "%s:\n", etiquetaOr);
@@ -278,7 +283,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
                     contVerdadero++;
                     apilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
-                    fprintf(arch, "BI %s\n", etiquetaVerdadero);
+                    fprintf(arch, "JMP %s\n", etiquetaVerdadero);
 
                     desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
                     fprintf(arch, "%s:\n", etiquetaFalso);
@@ -315,7 +320,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             strcpy(etiquetaCiclo, "etiquetaCiclo");
             itoa(contCiclo, nro, 10);
             strcat(etiquetaCiclo, nro);
-            fprintf(arch, "%s\n", etiquetaCiclo);
+            fprintf(arch, "%s:\n", etiquetaCiclo);
             apilar(&cicloAnidados, etiquetaCiclo, sizeof(etiquetaCiclo));
             contCiclo++;
 
@@ -337,16 +342,17 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                 {
                     strcpy(etiquetaFalso, "falso");
                     generarCodigoComparador(arch, opLogico->izq, contFalso, etiquetaFalso);
-                    contFalso++;
-
+                    
                     // 2da condicion
 
                     strcpy(etiquetaFalso, "falso");
                     generarCodigoComparador(arch, opLogico->der, contFalso, etiquetaFalso);
-                    contFalso++;
+                    
 
                     apilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
                     contFalso++;
+
+                    
                 }
                 else if (strcmp(opLogico->simbolo, "||") == 0)
                 {
@@ -354,7 +360,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                     invertirCondicion(opLogico->izq);
 
                     strcpy(etiquetaVerdadero, "verdadero");
-                    generarCodigoComparador(arch, opLogico->der, contVerdadero, etiquetaVerdadero);
+                    generarCodigoComparador(arch, opLogico->izq, contVerdadero, etiquetaVerdadero);
                     contVerdadero++;
 
                     // 2da condicion
@@ -369,7 +375,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             generarCodigo(arch, listaSimbolos, &padre->der);
 
             desapilar(&cicloAnidados, etiquetaCiclo, sizeof(etiquetaCiclo));
-            fprintf(arch, "BI %s\n", etiquetaCiclo);
+            fprintf(arch, "JMP %s\n", etiquetaCiclo);
 
             desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
             fprintf(arch, "%s:\n", etiquetaFalso);

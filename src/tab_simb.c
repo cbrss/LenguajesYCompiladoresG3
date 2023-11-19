@@ -1,6 +1,7 @@
 #include "../include/tab_simb.h"
 void sacarEspacios(char *str);
 void sacarPuntos(char* str);
+void borrarComas(char* str);
 
 Lista crearLista(Lista *pl)
 {
@@ -54,9 +55,11 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
         strncpy(nNombre, nombre + 1, longitud); // saco los "" del string
         nNombre[longitud] = '\0';               // strncpy no mete \0
         strcpy(nuevo_simbolo.nombre, "_s_");
+        strcpy(nuevo_simbolo.valor, nNombre);
+        borrarComas(nNombre);
         strcat(nuevo_simbolo.nombre, nNombre);
         strcpy(nuevo_simbolo.tipo_dato, TSTRING);
-        strcpy(nuevo_simbolo.valor, nNombre);
+        
         nuevo_simbolo.longitud = longitud;
 
         sacarEspacios(nuevo_simbolo.nombre);
@@ -81,6 +84,31 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
     nuevo->sig = *lista;
     *lista = nuevo;
 }
+void borrarComas(char* str){
+    char aux[STRING_LARGO_MAX + 1];
+    int coma = 0;
+    for(int i = 0, j = 0; str[i]; i++){
+        
+        if(str[i] == ','){
+            coma = 1;
+            aux[i] = '_';
+            aux[i+1] = 'c';
+            aux[i+2] = 'o';
+            aux[i+3] = 'm';
+            aux[i+4] = 'a';
+            aux[i+5] = '_';
+            i++;
+            j+=6;
+        }
+        aux[j] = str[i];
+        j++;
+    }
+    if(coma == 1){
+        strcpy(str, aux);
+    }
+    
+}
+
 void sacarEspacios(char *str) {
     for(int i = 0; str[i]; i++){
         if(str[i] == ' ')
