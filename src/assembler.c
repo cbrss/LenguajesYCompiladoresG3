@@ -65,7 +65,8 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             if (strcmp(auxTipo, "String") == 0)
             {
                 strncpy(auxValor, padre->der->simbolo + 1, strlen(padre->der->simbolo) - 2); // substring del simbolo sin las ""
-                fprintf(arch, "LEA EAX, %s\nMOV %s, EAX\n", obtenerNombre(listaSimbolos, auxValor, TSTRING), padre->izq->simbolo);
+                fprintf(arch, "mov si, OFFSET %s\nmov di, OFFSET %s\nSTRCPY\n",obtenerNombre(listaSimbolos, auxValor, TSTRING), padre->izq->simbolo );
+               
             }
             else if (strcmp(auxTipo, "Float") == 0)
             {
@@ -160,7 +161,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
             if (strcmp(padre->der->simbolo, "Int") == 0)
             {
-                fprintf(arch, "DisplayInteger %s\n", padre->izq->simbolo);
+                fprintf(arch, "DisplayFloat %s , 1\n", padre->izq->simbolo);
             }
             else if (strcmp(padre->der->simbolo, "Float") == 0)
             {
@@ -426,7 +427,7 @@ void generarCodigoComparador(FILE *arch, NodoA *comparacion, int cont, char *eti
 }
 void imprimirFin(FILE *arch)
 {
-    fprintf(arch, "\nMOV EAX, 4C00H\n");
+    fprintf(arch, "\nMOV AX, 4C00H\n");
     fprintf(arch, "INT 21h\n");
     fprintf(arch, "END START");
 }

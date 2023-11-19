@@ -1,7 +1,7 @@
 init {
-    a : String
+    a : Float
 }
-a = "hola"
 
+a=  2.23
+write(a)
 
-write("hola")

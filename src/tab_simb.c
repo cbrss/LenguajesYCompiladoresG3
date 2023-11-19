@@ -35,6 +35,7 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
 
         strcpy(nuevo_simbolo.nombre, "_");
         snprintf(strAux, STRING_LARGO_MAX, "%.2f", nombre);
+        
         strcat(nuevo_simbolo.nombre, strAux);
         strcpy(nuevo_simbolo.tipo_dato, TFLOAT);
         strcpy(nuevo_simbolo.valor, nombre);
@@ -291,7 +292,7 @@ void imprimirEncabezado(Lista* lista, int cantAux){
     fprintf(arch, "START:\n");
     fprintf(arch, "mov AX, @DATA\n");
     fprintf(arch, "mov DS, AX\n");
-    fprintf(arch, "mov es, ax\n");
+    fprintf(arch, "mov es, ax\n\n");
     fclose(arch);
 
 }
