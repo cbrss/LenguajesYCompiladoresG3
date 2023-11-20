@@ -1,13 +1,6 @@
 init {
-  a,b,c : Int
+
 }
-a = 2
-b = -2
-c = 2
-b = !cont(a :: [2,2,2,c])
 
-write(b)
 
-a = 1+2+3
-
-write(a)
+timer(5, write ("hola mundo"))

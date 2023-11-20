@@ -203,17 +203,21 @@ sentencia:
     |eval       { printf("\t\tR16: eval es Sentencia\n"); SentPtr = EvalPtr; }
     |TIMER PA INT { intAux = yylval.int_val; } COMA bloque_ejec PC { 
         printf("\t\tR17: timer(int,bloque_ejec) es Sentencia\n");
-        snprintf(strAux, sizeof(intAux), "%d", intAux);
-        SentPtr = crearNodo(
-                "ciclo", 
-                crearNodo("<", crearHoja("@_timerI"), crearHoja(strAux)),
-                    crearNodo(
-                        "BloEjec", BloPtr, 
-                        crearNodo("BloEjec", crearNodo("=", crearHoja("@_timerI"), crearHoja("0")),crearNodo("=", crearHoja("@_timerI"), crearNodo("+", crearHoja("@_timerI"), crearHoja("1")))
-                )
-            )
+        snprintf(strAux, sizeof(intAux), "_%d", intAux);
+        SentPtr = crearNodo
+                ("BloEjec",
+                crearNodo("=", crearHoja("@_timerI"), crearHoja("_0")),
+                            crearNodo("ciclo", 
+                            crearNodo("<", crearHoja("@_timerI"), crearHoja(strAux)),
+                                crearNodo("BloEjec", BloPtr,
+                                            crearNodo("=", crearHoja("@_timerI"), 
+                                                            crearNodo("+", crearHoja("@_timerI"), crearHoja("_1"))
+                                                    )
+                                        )
+                                    )
         );
-        
+        insertarEnLista(&listaSimbolos, "1", tINT);
+        insertarEnLista(&listaSimbolos, "0", tINT);
         insertarEnLista(&listaSimbolos, "@_timerI",  tID);
         asignarTipoDato(&listaSimbolos, "@_timerI", "Int");
         contadorAuxiliares++;
