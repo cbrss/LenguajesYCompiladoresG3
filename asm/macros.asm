@@ -176,6 +176,85 @@ LOCAL @@OK
 ENDM
 
 ;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+ESTACONTENIDO MACRO
+LOCAL @@CICLO, @@SUBCICLO, @@DISTINTO, @@FIN, @@TERMINA
+    ; inicializo bx
+    mov bx, 0
+
+@@CICLO:
+    ; verifico que ambas cadenas no terminaron
+    cmp byte ptr [si], '$'
+    je @@FIN
+    cmp byte ptr [di], '$'
+    je @@FIN
+
+    push si
+    push di
+
+    ; Compara los caracteres actuales de las cadenas
+    mov al, [si]
+    cmp al, [di]
+    jne @@DISTINTO
+
+    ; si son iguales, inicia un subciclo para comparar el resto de la cadena
+@@SUBCICLO:
+    inc si
+    inc di
+    cmp byte ptr [si], '$'
+    je @@FIN
+    cmp byte ptr [di], '$'
+    je @@FIN
+    mov al, [si]
+    cmp al, [di]
+    jne @@DISTINTO
+    jmp @@SUBCICLO
+
+@@DISTINTO:
+    ; Restaura los índices
+    pop di
+    pop si
+
+    ; Avanza a los siguientes caracteres
+    inc si
+    jmp @@CICLO
+
+@@FIN:
+    cmp byte ptr [di], '$'
+    jne @@TERMINA
+    mov bx, 1
+@@TERMINA:
+
+ENDM
+
+
+
+
+
+;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+STRNCPY MACRO
+LOCAL @@OK, @@LOOP, @@END
+    PUSH SI
+    PUSH DI
+    MOV CX, BX  ; Utiliza el valor en BX como la cuenta
+    CLD
+@@LOOP:
+    LODSB
+    OR AL, AL
+    JZ @@END
+    STOSB
+    LOOP @@LOOP
+@@END:
+    MOV AL, '$'
+    STOSB
+    POP DI
+    POP SI
+ENDM
+
+
+
+
+
+;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 STRLEN MACRO
 LOCAL @@STRL01, @@STREND

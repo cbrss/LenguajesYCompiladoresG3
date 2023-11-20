@@ -50,7 +50,6 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
     while (padre != NULL)
     {
-        printf("\n*%s*\n", padre->simbolo);
 
         if (strcmp(padre->simbolo, "BloEjec") == 0)
         {

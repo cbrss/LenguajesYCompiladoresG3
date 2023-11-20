@@ -2,6 +2,6 @@ init {
     cadenaResultante : String
 }
 
-
-cadenaResultante = concatenarConRecorte("Hola", "Mundo", 2)
-write(cadenaResultante)
+if ( estaContenido("hola", "hole")){
+    write("si")
+}
