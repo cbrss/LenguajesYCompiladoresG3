@@ -2,6 +2,7 @@
 void sacarEspacios(char *str);
 void sacarPuntos(char* str);
 void borrarComas(char* str);
+void sacarMenos(char* str);
 
 Lista crearLista(Lista *pl)
 {
@@ -25,9 +26,13 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
     else if (tDato == tINT)
     {
         strcpy(nuevo_simbolo.nombre, "_");
-        strcat(nuevo_simbolo.nombre, nombre);
-        strcpy(nuevo_simbolo.tipo_dato, TINT);
         strcpy(nuevo_simbolo.valor, nombre);
+       
+        strcat(nuevo_simbolo.nombre, nombre);
+        sacarMenos(nuevo_simbolo.nombre);
+
+        strcpy(nuevo_simbolo.tipo_dato, TINT);
+        
         nuevo_simbolo.longitud = strlen(nombre);
     }
     else if (tDato == tFLOAT)
@@ -85,9 +90,10 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
     *lista = nuevo;
 }
 void borrarComas(char* str){
-    char aux[STRING_LARGO_MAX + 1];
+    char aux[STRING_LARGO_MAX + 7];
     int coma = 0;
-    for(int i = 0, j = 0; str[i]; i++){
+    int j = 0;
+    for(int i = 0; str[i]; i++){
         
         if(str[i] == ','){
             coma = 1;
@@ -103,6 +109,7 @@ void borrarComas(char* str){
         aux[j] = str[i];
         j++;
     }
+    aux[j]='\0';
     if(coma == 1){
         strcpy(str, aux);
     }
@@ -120,6 +127,34 @@ void sacarPuntos(char *str) {
         if(str[i] == '.')
             str[i] = '_';
     }
+}
+void sacarMenos(char* str){
+    char aux[STRING_LARGO_MAX + 1];
+    int menos = 0;
+    int j = 0;
+    for(int i = 0; str[i]; i++){
+        
+        if(str[i] == '-'){
+            menos = 1;
+            aux[i] = '_';
+            aux[i+1] = 'm';
+            aux[i+2] = 'e';
+            aux[i+3] = 'n';
+            aux[i+4] = 'o';
+            aux[i+5] = 's';
+            aux[i+6] = '_';
+
+            i++;
+            j+=7;
+        }
+        aux[j] = str[i];
+        j++;
+    }
+    aux[j] = '\0';
+    if(menos == 1){
+        strcpy(str, aux);
+    }
+
 }
 
 char* obtenerNombre(Lista *lista, char* valor, char* tDato) {
@@ -299,6 +334,8 @@ void imprimirEncabezado(Lista* lista, int cantAux){
 
         lista = &(*lista)->sig;
     }
+
+
     int i = 1;
     if(cantAux != -1){
         while(cantAux != 0){

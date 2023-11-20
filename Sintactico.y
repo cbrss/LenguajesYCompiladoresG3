@@ -256,9 +256,9 @@ sentencia:
         SentPtr = crearNodo("BloEjec", 
                                 ParamContPtr, 
                                     crearNodo("if",
-                                        crearNodo("==", crearHoja("@_contI"), crearHoja("0")),
+                                        crearNodo("==", crearHoja("@_contI"), crearHoja("_0")),
                                         crearNodo("Cuerpo",
-                                            crearNodo("=", crearHoja($1), crearHoja("-1")),
+                                            crearNodo("=", crearHoja($1), crearHoja("__menos_1")),
                                             crearNodo("=", crearHoja($1), crearHoja("@_contI"))
                                         )
                                     )
@@ -266,6 +266,9 @@ sentencia:
                             );
        //verificar que ID sea float o int
         contadorAuxiliares++;
+        contadorAuxiliares++;
+        maximo();
+        
         insertarEnLista(&listaSimbolos, "1", tINT);
         insertarEnLista(&listaSimbolos, "0", tINT);
         insertarEnLista(&listaSimbolos, "-1", tINT);
@@ -273,7 +276,9 @@ sentencia:
         asignarTipoDato(&listaSimbolos, "@auxExp", "Float");
         insertarEnLista(&listaSimbolos, "@_contI",  tID);
         asignarTipoDato(&listaSimbolos, "@_contI", "Int");
+        
     }
+    
     ;
 
 
@@ -336,14 +341,14 @@ param_cont_mul:
     param_asig  {printf("\t\t\tRx6: param_asig es param_cont_mul\n");
      
         ParamContPtr = crearNodo("BloEjec", 
-                                        crearNodo("BloEjec", crearNodo("=", crearHoja("@_contI"), crearHoja("0")),crearNodo("=",crearHoja("@auxExp"), auxCont)), 
+                                        crearNodo("BloEjec", crearNodo("=", crearHoja("@_contI"), crearHoja("_0")),crearNodo("=",crearHoja("@auxExp"), auxCont)), 
                                         crearNodo("if", 
                                             crearNodo("!=", crearHoja("@auxExp"), ParamAsigPtr), 
-                                            crearNodo("+", crearHoja("@_contI"), crearHoja("1"))));
+                                            crearNodo("+", crearHoja("@_contI"), crearHoja("_1"))));
         
     }
     | param_cont_mul COMA param_asig {printf("\t\t\tRx6: param_asig , param_asig es param_cont_mul\n");
-        ParamContPtr = crearNodo("BloEjec", ParamContPtr, crearNodo("if", crearNodo("!=", crearHoja("@auxExp"), ParamAsigPtr), crearNodo("+", crearHoja("@_contI"), crearHoja("1"))));
+        ParamContPtr = crearNodo("BloEjec", ParamContPtr, crearNodo("if", crearNodo("!=", crearHoja("@auxExp"), ParamAsigPtr), crearNodo("+", crearHoja("@_contI"), crearHoja("_1"))));
     }
     ; 
 
@@ -383,6 +388,7 @@ asignacion:
         
         AsigPtr = crearNodo("=", crearHoja($1), Eptr);
         maximo();
+        printf("\n\ncontador en exp: %d\n\n",contadorAuxiliares);
         contadorAuxiliares=0;
     }
     |ID OP_AS string  { 
@@ -489,8 +495,8 @@ expresion:
     ;
  
 termino:
-    factor                  { printf("\t\t\t\t  R45: Factor es Termino\n"); Tptr = Fptr; }
-    |OP_RES factor          { printf("\t\t\t\t  R46: -Factor es Termino\n"); Tptr = crearNodo("*", crearHoja("-1"), Fptr); contadorAuxiliares++;}
+    factor                  { printf("\t\t\t\t  R45: Factor es Termino\n"); Tptr = Fptr; }                                 
+    |OP_RES factor          { printf("\t\t\t\t  R46: -Factor es Termino\n"); Tptr = crearNodo("*", crearHoja("_-1"), Fptr); insertarEnLista(&listaSimbolos, "-1", tINT );  contadorAuxiliares++;}
     |termino OP_MUL factor  { printf("\t\t\t\t  R47: Termino*Factor es Termino\n"); Tptr = crearNodo("*", Tptr, Fptr); contadorAuxiliares++;}
     |termino OP_DIV factor  { printf("\t\t\t\t  R48: Termino/Factor es Termino\n"); Tptr = crearNodo("/", Tptr, Fptr); contadorAuxiliares++;}
     ;

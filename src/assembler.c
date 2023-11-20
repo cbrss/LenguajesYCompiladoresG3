@@ -19,6 +19,7 @@ int operadorOr = 0;
 Pila ifFalso, ifVerdadero, ifOr, cicloAnidados;
 void generarCodigoComparador(FILE *arch, NodoA *padre, int nro, char *etiquetaFalso);
 void sacarPunto(char* str);
+void sacarMenosInt(char* str);
 void incializarPilas()
 {
     crearPila(&ifFalso);
@@ -56,6 +57,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             generarCodigo(arch, listaSimbolos, &padre->der);
         }
         if (strcmp(padre->simbolo, "decAsigM") == 0){
+          
             generarCodigo(arch, listaSimbolos, &padre->der);
         }
 
@@ -78,9 +80,10 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                 fprintf(arch, "FSTP %s\n", padre->izq->simbolo);
             }
             else if (strcmp(auxTipo, "Int") == 0)
-            {
+            {   
                 fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FRNDINT\n");
+                
                 fprintf(arch, "FSTP %s\n", padre->izq->simbolo);
             }
             // TODO: si es String usar _2_+_42, posiblemente buscar en TS
@@ -92,6 +95,9 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
             // generarCodigo(arch, listaSimbolos, &padre->izq);
             generarCodigo(arch, listaSimbolos, &padre->der);
+            //si existe un menos, cambio simbolo - por _menos_
+            sacarMenosInt(padre->der->simbolo);
+            sacarMenosInt(padre->izq->simbolo);
             if (strcmp(padre->simbolo, "+") == 0)
             {
 
@@ -129,6 +135,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             }
             else if (strcmp(padre->simbolo, "*") == 0)
             {
+              
                 fprintf(arch, "FLD %s\n", padre->izq->simbolo);
                 fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FMUL\n");
@@ -504,4 +511,34 @@ void sacarPunto(char *str) {
         if(str[i] == '.')
             str[i] = '_';
     }
+}
+
+
+void sacarMenosInt(char* str){
+    char aux[STRING_LARGO_MAX + 1];
+    int menos = 0;
+    int j = 0;
+    for(int i = 0; str[i]; i++){
+        
+        if(str[i] == '-'){
+            menos = 1;
+            aux[i] = '_';
+            aux[i+1] = 'm';
+            aux[i+2] = 'e';
+            aux[i+3] = 'n';
+            aux[i+4] = 'o';
+            aux[i+5] = 's';
+            aux[i+6] = '_';
+
+            i++;
+            j+=7;
+        }
+        aux[j] = str[i];
+        j++;
+    }
+    aux[j] = '\0';
+    if(menos == 1){
+        strcpy(str, aux);
+    }
+
 }
