@@ -1,6 +1,7 @@
 init {
-
+    cadenaResultante : String
 }
 
 
-timer(5, write ("hola mundo"))
+cadenaResultante = concatenarConRecorte("Hola", "Mundo", 2)
+write(cadenaResultante)

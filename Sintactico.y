@@ -419,7 +419,9 @@ string:
     }
     |CONCAT PA STRING { strcpy(strAux, $3); } COMA STRING { strcpy(strAux2, $6); } COMA INT PC { 
         printf("\t\t\tR24: concatenarConRecorte(String, String, Int) es String\n"); 
-        StrPtr = crearHoja(concatenar(strAux, strAux2, yylval.int_val));
+        strcpy(strAux, concatenar(strAux, strAux2, yylval.int_val));
+        StrPtr = crearHoja(strAux);
+        insertarEnLista(&listaSimbolos, strAux, tSTRING);
     }
     ;
 
@@ -466,10 +468,15 @@ comparacion:
     }
     |ESTA_CONT PA STRING { strcpy(strAux, $3); } COMA STRING PC { printf("\t\t\t\tR31: estaContenido(String, String) es Comparacion\n"); 
         if(estaContenido(strAux, yylval.string_val) == 1){
-            CmpPtr = crearNodo("==", crearHoja("1"), crearHoja("1"));
+            CmpPtr = crearNodo("==", crearHoja("_1"), crearHoja("_1"));
+            insertarEnLista(&listaSimbolos, "1", tINT);
         } else{
-            CmpPtr = crearNodo("==", crearHoja("1"), crearHoja("0"));
+            CmpPtr = crearNodo("==", crearHoja("_1"), crearHoja("_0"));
+            insertarEnLista(&listaSimbolos, "1", tINT);
+            insertarEnLista(&listaSimbolos, "0", tINT);
         }
+        
+        
         
     }
     
