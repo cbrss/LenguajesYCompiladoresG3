@@ -1,7 +1,11 @@
 init {
-    cadenaResultante : String
+
 }
 
-if ( estaContenido("hola", "hole")){
-    write("si")
+
+if ( estaContenido("holamundo", "hola")){
+    write("si esta contenido")
+}else{
+    write("no esta contenido")
 }
+

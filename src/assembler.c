@@ -50,6 +50,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
     while (padre != NULL)
     {
+        printf("\nanalizando: *%s*\n", padre->simbolo);
 
         if (strcmp(padre->simbolo, "BloEjec") == 0)
         {
@@ -69,6 +70,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             if (strcmp(auxTipo, "String") == 0)
             {
                 strncpy(auxValor, padre->der->simbolo + 1, strlen(padre->der->simbolo) - 2); // substring del simbolo sin las ""
+                auxValor[strlen(padre->der->simbolo) - 2] = '\0';
                 fprintf(arch, "mov si, OFFSET %s\nmov di, OFFSET %s\nSTRCPY\n",obtenerNombre(listaSimbolos, auxValor, TSTRING), padre->izq->simbolo );
                
             }
@@ -204,8 +206,21 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             }
         }
 
+        if (strcmp(padre->simbolo, "estaContenido") == 0){
+
+            strncpy(auxValor, padre->izq->simbolo + 1, strlen(padre->izq->simbolo) - 2); // substring del simbolo sin las ""
+            auxValor[strlen(padre->izq->simbolo) - 2] = '\0';
+            fprintf(arch, "mov si, OFFSET %s\n", obtenerNombre(listaSimbolos, auxValor, TSTRING));
+
+            strncpy(auxValor, padre->der->simbolo + 1, strlen(padre->der->simbolo) - 2); // substring del simbolo sin las ""
+            auxValor[strlen(padre->der->simbolo) - 2] = '\0';
+            fprintf(arch, "mov di, OFFSET %s\n", obtenerNombre(listaSimbolos, auxValor, TSTRING));
+
+            fprintf(arch, "ESTACONTENIDO\n");
+        }
         if (strcmp(padre->simbolo, "if") == 0)
         {
+            
             if (strcmp(padre->der->simbolo, "Cuerpo") == 0)
             {
                 existeElse = 1;
@@ -214,6 +229,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             if (esComparador(padre->izq->simbolo) == 1)
             { // condicion simple
                 strcpy(etiquetaFalso, "falso");
+                
                 generarCodigoComparador(arch, padre->izq, contFalso, etiquetaFalso);
                 contFalso++;
 
@@ -397,6 +413,22 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
 void generarCodigoComparador(FILE *arch, NodoA *comparacion, int cont, char *etiqueta)
 {
+
+    if(strcmp(comparacion->simbolo, "estaContenido") == 0){
+        itoa(cont, nro, 10);
+        strcat(etiqueta, nro);
+        fprintf(arch, "mov _temp, ebx\n");
+        fprintf(arch, "fild _temp\n");
+        fprintf(arch, "frndint\n");
+        fprintf(arch, "fstp _temp\n");
+        fprintf(arch, "fld _1\n");
+       
+        fprintf(arch, "fcomp _temp\n");
+        fprintf(arch, "fstsw ax\n"); // los flags del coprocesador en memoria
+        fprintf(arch, "sahf\n");     // guardo los flags que estan en memoria en el registro FLAG del cpu
+        fprintf(arch, "JNE %s\n", etiqueta);
+        return;
+    }
     fprintf(arch, "fld %s\n", comparacion->izq->simbolo);
     fprintf(arch, "fcomp %s\n", comparacion->der->simbolo);
 
@@ -438,7 +470,7 @@ void generarCodigoComparador(FILE *arch, NodoA *comparacion, int cont, char *eti
         itoa(cont, nro, 10);
         strcat(etiqueta, nro);
         fprintf(arch, "JNE %s\n", etiqueta);
-    }
+    } 
 }
 void imprimirFin(FILE *arch)
 {
@@ -481,7 +513,8 @@ int esComparador(char *op)
         strcmp(op, ">") == 0 ||
         strcmp(op, ">=") == 0 ||
         strcmp(op, "==") == 0 ||
-        strcmp(op, "!=") == 0)
+        strcmp(op, "!=") == 0 ||
+        strcmp(op, "estaContenido") == 0)
         return 1;
 
     return 0;
