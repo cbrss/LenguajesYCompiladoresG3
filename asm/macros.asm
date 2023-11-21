@@ -227,7 +227,69 @@ LOCAL @@CICLO, @@SUBCICLO, @@DISTINTO, @@FIN, @@TERMINA
 ENDM
 
 
+;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+;en bx guardo cantidad
 
+CONCATENARCONRECORTE MACRO
+LOCAL @@CONCAT, @@CICLO, @@FINERROR, @@TERMINAR
+
+mov cx, bx
+push si
+push di
+cmp bx, 0
+JNAE @@FINERROR
+
+cmp bx, 0
+JE @@CONCAT
+
+@@CICLO:
+	inc si
+	cmp byte ptr [si], '$'
+	je @@FINERROR           
+	inc di
+	cmp byte ptr [di], '$'
+	je @@FINERROR
+
+	dec bx
+    
+	cmp bx, 1
+	JNB @@CICLO
+    JMP @@CONCAT
+@@FINERROR:
+    displayString _errorConCat
+    newline 1
+    JMP @@TERMINAR
+@@CONCAT:
+
+
+    strcat
+    pop di
+    pop si
+    inc si
+    inc si
+    STRCPY
+    
+@@TERMINAR:
+
+ENDM
+
+;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+strcatMIO MACRO
+LOCAL @@LOOP, @@END
+   
+  
+
+@@LOOP:
+    lodsb           ; Load string byte at address DS:SI into AL
+    or al, al       ; Check if AL is zero (end of string)
+    jz @@END        ; If it is, jump to @@END
+    stosb           ; Store AL at address ES:DI and increment DI
+    jmp @@LOOP      ; Repeat the process
+
+@@END:
+    stosb           ; Store the null terminator at the end of the destination string
+ENDM
 
 
 ;+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++

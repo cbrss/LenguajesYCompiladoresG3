@@ -1,15 +1,12 @@
-flex lexico.l
-bison -dyv sintactico.y
+PATH=D:\compilador\LenguajesYCompiladoresG3;
 
-gcc.exe lex.yy.c y.tab.c ./src/tab_simb.c ./src/arbol.c ./src/pila.c ./src/cola.c ./src/assembler.c -o lyc-compiler-3.0.0
-lyc-compiler-3.0.0 casos_de_prueba/testSimple.txt
-dot -Tpng intermediate-code.dot -o arbol.png
+asm\TASM\tasm asm\numbers.asm
+asm\TASM\tasm final.asm
+asm\TASM\tlink /3 /x /v /k final.obj numbers.obj
+final.exe
+del final.obj 
+del numbers.obj 
+del final.exe
 
-@echo off
-del lyc-compiler-3.0.0
-del lex.yy.c
-del y.tab.c
-del y.tab.h
-del y.output
-del intermediate-code.dot
+
 

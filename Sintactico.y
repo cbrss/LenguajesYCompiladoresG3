@@ -40,7 +40,7 @@
     char AuxDec[ID_LARGO_MAX + 1];
     NodoA* AuxPtr;
     NodoA * auxCont;
-    char  auxTipo[7], strAux[VALOR_LARGO_MAX + 1], strAux2[VALOR_LARGO_MAX + 1], cmpAux[3], opAux[3];
+    char  auxTipo[7], strAux[VALOR_LARGO_MAX + 1], strAux2[VALOR_LARGO_MAX + 1], strAux3[VALOR_LARGO_MAX + 1], cmpAux[3], opAux[3];
     char strAuxAsig[VALOR_LARGO_MAX + 1];
     char auxValor[VALOR_LARGO_MAX];
     int intAux;
@@ -288,16 +288,16 @@ sentencia:
 
 
 dec_asig_mul: 
-    ID {encolar(&colaIds, $1, STRING_LARGO_MAX + 1); printf("Encolando: %s", $1);} CC DOS_P CA param_asig {
+    ID {encolar(&colaIds, $1, STRING_LARGO_MAX + 1); } CC DOS_P CA param_asig {
         printf("\t\t\tRx3: ] : [ es cierre de Dec_asig_mul\n");
 
         desencolar(&colaIds, strAux, STRING_LARGO_MAX + 1);
-        printf("desencolando: %s\n", strAux);
+       
         if(!idDeclarado(&listaSimbolos, strAux)){ 
             printf("\nError, id: *%s* no fue declarado\n", $1);
             return 1;
         };
-        printf("\nse asigna: *%s* a *%s*\n ", strAux, strAuxAsig);
+       
         if(!esMismoTipo(&listaSimbolos, strAux, strAuxAsig)){ 
             printf("\nError, datos de diferente tipo.\n");
             return 1;
@@ -363,7 +363,7 @@ cte:
         strcpy(strAuxAsig, "Int");
     }
     | FLOAT  {printf("\t\t\t  Rx5: float es Cte\n");
-        snprintf(strAux, MIN(sizeof($1), VALOR_LARGO_MAX), "_%.2f", $1);
+        snprintf(strAux, VALOR_LARGO_MAX, "_%.2f", $1);
         CtePtr = crearHoja(strAux);
         strcpy(strAuxAsig, "Float");
     }
@@ -419,9 +419,16 @@ string:
     }
     |CONCAT PA STRING { strcpy(strAux, $3); } COMA STRING { strcpy(strAux2, $6); } COMA INT PC { 
         printf("\t\t\tR24: concatenarConRecorte(String, String, Int) es String\n"); 
+        /*
+        snprintf(strAux3, VALOR_LARGO_MAX, "_%d", yylval.int_val);
+        crearHoja(strAux3); 
+        StrPtr = crearNodo("concatenarConRecorte", crearNodo("cant",crearHoja(strAux3),crearHoja(strAux)), crearHoja(strAux2));
+        insertarEnLista(&listaSimbolos, "Error Concat", tSTRING);
+        */
         strcpy(strAux, concatenar(strAux, strAux2, yylval.int_val));
         StrPtr = crearHoja(strAux);
         insertarEnLista(&listaSimbolos, strAux, tSTRING);
+        
     }
     ;
 

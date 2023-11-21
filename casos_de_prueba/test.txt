@@ -1,133 +1,64 @@
 init {
-    entero_min, a,b,c, entero_max: Int *- Multiples variables -*
-    float_min: Float
-    float_max: Float
-    cad_min, cad_test1, cad_test2, cad_test3, cad_test4, cad_test5, cad_test6, cad_test7: String
-    cad_max: String
-    cad_any: String
-    cad_concat1, cad_concat2, cad_concat3 : String
+    entero_min, a,b,c, entero_max: Int 
+    cad_test5, cad_concat1, cad_test6: String
     compl1, compl2 : Int
     compl3 : Float
     compl4 : String
     contar1, contar2, contar3 : Int
  
 }
-
-*-
-    Comentario:
-        *-
-            Comentario 
-            anidado y 
-            multilinea
-        -*
--*
-
-*- OK -*
-
-entero_min = -32768
-entero_max = 32768
-float_min = -2147483648.
-float_max = 2147483648.
-
-cad_max = "0123456789012345678901234"
-
-
-
-*- FUNCIONES -*
-write(cad_test4)
-write("hola mundo")
-read(cad_test5)
-
-*- CONCATENAR -*
-cad_concat1 = concatenarConRecorte("01234567890123456789", "pepi", 2)
-cad_concat2 = concatenarConRecorte("01", "pe", 2)
-cad_concat3 = concatenarConRecorte("011", "pe1", 2)
-
-*- TIMER + estaContenido -*
-
-if(estaContenido("a", "abc")) {
-    timer(5, write("msjWrite1"))
-}
-
+a = 2
+b = 3
+c = 4
+write("ejecutando if")
 *- CONDICIONALES -*
-    *- Simples -*
-    if (a < b) {
-        cad_test6 = "test"
-        write("write <")
-    }
-
-    if (a > b) {
-        write("write >")
-    }
-
-    if (a <= b) {
-        read(cad_test7)
-    }
-
-    if (a >= b) {
-        write("write >=")
-    }
-
-    if (a == b) {
-        write("write ==")
-    }
-
-    if (a != b) {
-        write("write !=")
-    }
-
-    if ( not a < b ) {
-        write("write not <")
-    }
-
     *- Dobles -*
     if (a < b & b < c) {
-        write("write a < b & b < c")
+        write("write if doble OR")
     }
 
-    if (a < b || b < c) {
-        write("write a < b || b < c")
-    }
 
-    *- Etc -*
-    if (a < b) {
-        write("if a < b")
-    }
-    else {
-        write("write else")
-    }
-    
-
-    if (a < b) {
-        write("write < if")
-        if (a < b) {
-            write("write < if anidado")
-        }
-    }
-
-    if (not entero_min) {
-        write("write not id")
-    }
-   
-
-*- CICLO -*
-
+write("ejecutando ciclos")
 ciclo (a > b) {
-    write("write > ciclo")
+    write("ciclo externo anidado ciclo")
+    a = b + 1
+    ciclo (a > c) {
+        a = c + 1
+        write("ciclo interno anidado")
+    }
 }
 
-ciclo (a > b) {
-    write("write > ciclo")
-    ciclo (a < b) {
-        write("write < ciclo anidado")
-    }
+*- FUNCIONES -*
+
+write("hola mundo, escribir valor de cad5")
+read(cad_test5)
+write(cad_test5)
+
+*- CONCATENAR -*
+write("ejecutando concatenarConRecorte")
+cad_concat1 = concatenarConRecorte("hola", "mundo", 2)
+write(cad_concat1)
+
+*- TIMER + estaContenido -*
+write("ejecutando estaContenido con abc, abc")
+if(estaContenido("abcd", "abc")) {
+    write("ejecutando timer")
+    timer(3, write("msjWrite1"))
+
 }
+
 
 
 *- Asignacion compleja -*
-AsigComp([compl1, compl2, compl3, compl4] : [1, 2, 2.5, "pepe"])
-AsigComp([compl1] : [1])
+write("ejecutando asigCompleja")
+AsigComp([compl1, compl3, compl4] : [1, 2.5, "pepe"])
+write(compl1)
+write(compl3)
+write(compl4)
 
+write("ejecutando contarDistinto")
 *- Contar distinto -*
 c = !cont(a+b+3/c :: [contar1,contar2,contar3,3,2,3])
-c = !cont(a+b+3/c :: [contar1])
+
+write("resultado")
+write(c)

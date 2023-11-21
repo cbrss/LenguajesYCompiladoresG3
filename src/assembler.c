@@ -50,8 +50,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
     while (padre != NULL)
     {
-        printf("\nanalizando: *%s*\n", padre->simbolo);
-
+       
         if (strcmp(padre->simbolo, "BloEjec") == 0)
         {
             generarCodigo(arch, listaSimbolos, &padre->der);
@@ -60,13 +59,30 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
           
             generarCodigo(arch, listaSimbolos, &padre->der);
         }
+        if (strcmp(padre->simbolo, "concatenarConRecorte") == 0){
+           
+            fprintf(arch, "mov bx, %s\n", padre->izq->izq->simbolo);
+
+            strncpy(auxValor, padre->izq->der->simbolo + 1, strlen(padre->izq->der->simbolo) - 2); // substring del simbolo sin las ""
+            auxValor[strlen(padre->izq->der->simbolo) - 2] = '\0';
+            fprintf(arch, "mov si, OFFSET %s\n", obtenerNombre(listaSimbolos, auxValor, TSTRING));
+
+            strncpy(auxValor, padre->der->simbolo + 1, strlen(padre->der->simbolo) - 2); // substring del simbolo sin las ""
+            auxValor[strlen(padre->der->simbolo) - 2] = '\0';
+            fprintf(arch, "mov di, OFFSET %s\n", obtenerNombre(listaSimbolos, auxValor, TSTRING));
+
+
+            fprintf(arch, "CONCATENARCONRECORTE\n");
+            strcpy(padre->simbolo, padre->izq->der->simbolo);
+        }
 
         if (strcmp(padre->simbolo, "=") == 0)
         {
 
             strcpy(auxTipo, obtenerTipo(listaSimbolos, padre->izq->simbolo));
-
+        
             generarCodigo(arch, listaSimbolos, &padre->der);
+         
             if (strcmp(auxTipo, "String") == 0)
             {
                 strncpy(auxValor, padre->der->simbolo + 1, strlen(padre->der->simbolo) - 2); // substring del simbolo sin las ""
@@ -218,6 +234,9 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
             fprintf(arch, "ESTACONTENIDO\n");
         }
+        
+        
+        
         if (strcmp(padre->simbolo, "if") == 0)
         {
             

@@ -193,7 +193,8 @@ int esComparadorArbol(char* op){
         strcmp(op, "==") == 0 ||
         strcmp(op, "!=") == 0 ||
         strcmp(op, "&") == 0 ||
-        strcmp(op, "||") == 0)
+        strcmp(op, "||") == 0 || 
+        strcmp(op, "cant") == 0)
         return 1;
 
     return 0;
