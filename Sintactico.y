@@ -392,7 +392,7 @@ asignacion:
         
         AsigPtr = crearNodo("=", crearHoja($1), Eptr);
         maximo();
-        printf("\n\ncontador en exp: %d\n\n",contadorAuxiliares);
+
         contadorAuxiliares=0;
     }
     |ID OP_AS string  { 
