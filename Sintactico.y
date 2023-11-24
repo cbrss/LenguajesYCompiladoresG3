@@ -364,7 +364,7 @@ cte:
         strcpy(strAuxAsig, "Int");
     }
     | FLOAT  {printf("\t\t\t  Rx5: float es Cte\n");
-         snprintf(strAux, VALOR_LARGO_MAX, "_%.2f", $1);
+       // snprintf(strAux, VALOR_LARGO_MAX + 1, "_%.2f", $1);
         strcpy(strAux, "_");
         strcat(strAux,yylval.string_val);
 
@@ -552,7 +552,7 @@ factor:
         printf("\t\t\t\t    R52: FLOAT es Factor\n"); 
      
     
-        snprintf(strAux, VALOR_LARGO_MAX, "_%.2f", $1);
+        //snprintf(strAux, VALOR_LARGO_MAX, "_%.2f", $1);
         strcpy(strAux, "_");
         strcat(strAux,yylval.string_val);
 

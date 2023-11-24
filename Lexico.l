@@ -94,7 +94,7 @@ MENOR_IGUAL "<="
                     yylval.int_val = atoi(yytext); return INT;}
 
 {FLOAT}         {   if (fa_verificarRangoFloat(yytext) == TRUE){
-                       printf("\n tengo en lexico: *%s*", yytext);
+                      
                         insertarEnLista(&listaSimbolos, yytext, tFLOAT);
                     }; 
                     

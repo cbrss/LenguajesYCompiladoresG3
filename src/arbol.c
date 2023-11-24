@@ -117,7 +117,7 @@ void recorrerArbolInOrdenTexto(Arbol *pa, int nivel, FILE *arch)
    
     for (int i = 0; i < nivel; i++)
         fprintf(arch, "\t");
-    fprintf(arch, "%s\n", &(*pa)->simbolo);
+    fprintf(arch, "%s\n", (char*)&(*pa)->simbolo);
 
     recorrerArbolInOrdenTexto(&(*pa)->der, nivel + 1, arch);
 }
@@ -129,7 +129,7 @@ void recorrerArbolInOrdenOUT(Arbol *pa)
     recorrerArbolInOrdenOUT(&(*pa)->izq);
    
    
-    printf("%s\n", &(*pa)->simbolo);
+    printf("%s\n", (char*)&(*pa)->simbolo);
 
     recorrerArbolInOrdenOUT(&(*pa)->der);
 }

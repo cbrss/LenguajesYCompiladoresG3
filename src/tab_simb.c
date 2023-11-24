@@ -53,8 +53,6 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
         nuevo_simbolo.longitud = strlen(nombre);
         
         sacarPuntos(nuevo_simbolo.nombre);
-        
-
     }
     else if (tDato == tSTRING)
     {
@@ -533,10 +531,10 @@ void imprimirEncabezado(Lista* lista, int cantAux){
             fprintf(arch, "%s dd %s.00\n", (*lista)->simb.nombre, (*lista)->simb.valor);
         } else if (strcmp((*lista)->simb.tipo_dato, "Float") == 0){
             fprintf(arch, "%s dd %s\n", (*lista)->simb.nombre, (*lista)->simb.valor);   //si es float
-        } else{
+        } else{ //si es string
             fprintf(arch, "%s db \"%s\" , '$', %d dup (?)\n", (*lista)->simb.nombre, (*lista)->simb.valor, (*lista)->simb.longitud);
         }
-        //TODO: faltaria si es un string
+   
 
         lista = &(*lista)->sig;
     }
@@ -549,7 +547,11 @@ void imprimirEncabezado(Lista* lista, int cantAux){
             char numero[ID_LARGO_MAX];
 
             strcpy(auxiliar, "@aux");
+
+            //TODO: MODIFICAR ITOA
+ 
             itoa(i, numero, 10);
+            
             strcat(auxiliar, numero);
             fprintf(arch, "%s dd ?\n",auxiliar);
             i++;

@@ -1,5 +1,6 @@
 init {
     entero_min, a,b,c, entero_max: Int 
+    d : Float
     cad_test, cad_concat1, cad_test6: String
     compl1 : Int
     compl2 : Float
@@ -10,19 +11,21 @@ init {
 a = 2
 b = 3
 c = 4
-write("valor de a es:")
+d = 2.5
+write("valor de int a es:")
 write(a)
-write("valor de b es:")
+write("valor de int b es:")
 write(b)
-write("valor de c es:")
+write("valor de int c es:")
 write(c)
+write("valor de float d es:")
+write(d)
 
 write("ejecutando if")
-*- CONDICIONALES -*
-    *- Dobles -*
-    if (a < b & b < c) {
-       
-    }
+
+if (a < b & b < c) {
+    write("a menor que b y b menor que c")
+}
 
 
 write("ejecutando ciclos a menor que b")
@@ -35,6 +38,7 @@ ciclo (a < b) {
         write("ciclo interno anidado")
     }
 }
+
 
 *- FUNCIONES -*
 
@@ -56,7 +60,9 @@ timer(3, write("mensaje Timer"))
 
 *- Asignacion compleja -*
 write("ejecutando asigCompleja")
+write("asignando: 1 2.5 pepe")
 AsigComp([compl1, compl2, compl3] : [1, 2.5, "pepe"])
+write("resultado de la asignacion:")
 write(compl1)
 write(compl2)
 write(compl3)
