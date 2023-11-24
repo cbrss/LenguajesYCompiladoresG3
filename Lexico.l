@@ -16,7 +16,6 @@
     int fa_verificarRangoInt(char*);
     int fa_verificarRangoFloat(char*);
     int fa_verificarRangoStr(char*);
-    char strAux[STRING_LARGO_MAX];
 
 %}
 

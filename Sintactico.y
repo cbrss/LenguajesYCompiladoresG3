@@ -43,7 +43,6 @@
     NodoA * auxCont;
     char  auxTipo[7], strAux[VALOR_LARGO_MAX + 1], strAux2[VALOR_LARGO_MAX + 1], strAux3[VALOR_LARGO_MAX + 1], cmpAux[3], opAux[3];
     char strAuxAsig[VALOR_LARGO_MAX + 1];
-    char auxValor[VALOR_LARGO_MAX];
     int intAux;
     float floatAux;
     int contador;
