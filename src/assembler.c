@@ -135,7 +135,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                     fprintf(arch, "FSTP @aux%d\n", contOp);
 
                     strcpy(auxAsm, "@aux");
-                    itoa(contOp, auxAsmOp, 10);
+                    snprintf(auxAsmOp, STRING_LARGO_MAX + 1, "%d", contOp);
                     strcat(auxAsm, auxAsmOp);
 
                     strcpy(padre->simbolo, auxAsm);
@@ -150,7 +150,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                 fprintf(arch, "FSTP @aux%d\n", contOp);
 
                 strcpy(auxAsm, "@aux");
-                itoa(contOp, auxAsmOp, 10);
+                snprintf(auxAsmOp, STRING_LARGO_MAX + 1, "%d", contOp);
                 strcat(auxAsm, auxAsmOp);
 
                 strcpy(padre->simbolo, auxAsm);
@@ -165,7 +165,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                 fprintf(arch, "FSTP @aux%d\n", contOp);
 
                 strcpy(auxAsm, "@aux");
-                itoa(contOp, auxAsmOp, 10);
+                snprintf(auxAsmOp, STRING_LARGO_MAX + 1, "%d", contOp);
                 strcat(auxAsm, auxAsmOp);
 
                 strcpy(padre->simbolo, auxAsm);
@@ -179,7 +179,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                 fprintf(arch, "FSTP @aux%d\n", contOp);
 
                 strcpy(auxAsm, "@aux");
-                itoa(contOp, auxAsmOp, 10);
+                snprintf(auxAsmOp, STRING_LARGO_MAX + 1, "%d", contOp);
                 strcat(auxAsm, auxAsmOp);
 
                 strcpy(padre->simbolo, auxAsm);
@@ -310,7 +310,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                 {                                                         // si op logico es OR ||
                     generarCodigo(arch, listaSimbolos, &padre->der->izq); // true
                     strcpy(etiquetaVerdadero, "verdadero");
-                    itoa(contVerdadero, nro, 10);
+                    snprintf(nro, STRING_LARGO_MAX + 1, "%d", contVerdadero);
                     strcat(etiquetaVerdadero, nro);
 
                     contVerdadero++;
@@ -331,7 +331,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
                     generarCodigo(arch, listaSimbolos, &padre->der->izq); // true
                     strcpy(etiquetaVerdadero, "verdadero");
-                    itoa(contVerdadero, nro, 10);
+                    snprintf(nro, STRING_LARGO_MAX + 1, "%d", contVerdadero);
                     strcat(etiquetaVerdadero, nro);
 
                     contVerdadero++;
@@ -371,7 +371,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
         if (strcmp(padre->simbolo, "ciclo") == 0)
         {
             strcpy(etiquetaCiclo, "etiquetaCiclo");
-            itoa(contCiclo, nro, 10);
+            snprintf(nro, STRING_LARGO_MAX + 1, "%d", contCiclo);
             strcat(etiquetaCiclo, nro);
             fprintf(arch, "%s:\n", etiquetaCiclo);
             apilar(&cicloAnidados, etiquetaCiclo, sizeof(etiquetaCiclo));
@@ -443,7 +443,7 @@ void generarCodigoComparador(FILE *arch, NodoA *comparacion, int cont, char *eti
 {
 
     if(strcmp(comparacion->simbolo, "estaContenido") == 0){
-        itoa(cont, nro, 10);
+        snprintf(nro, STRING_LARGO_MAX + 1, "%d", cont);
         strcat(etiqueta, nro);
         fprintf(arch, "mov _temp, ebx\n");
         fprintf(arch, "fild _temp\n");
@@ -465,37 +465,37 @@ void generarCodigoComparador(FILE *arch, NodoA *comparacion, int cont, char *eti
 
     if (strcmp(comparacion->simbolo, "<") == 0)
     {
-        itoa(cont, nro, 10);
+        snprintf(nro, STRING_LARGO_MAX + 1, "%d", cont);
         strcat(etiqueta, nro);
         fprintf(arch, "JNB %s\n", etiqueta); // ini
     }
     else if (strcmp(comparacion->simbolo, ">") == 0)
     {
-        itoa(cont, nro, 10);
+        snprintf(nro, STRING_LARGO_MAX + 1, "%d", cont);
         strcat(etiqueta, nro);
         fprintf(arch, "JBE %s\n", etiqueta);
     }
     else if (strcmp(comparacion->simbolo, "<=") == 0)
     {
-        itoa(cont, nro, 10);
+        snprintf(nro, STRING_LARGO_MAX + 1, "%d", cont);
         strcat(etiqueta, nro);
         fprintf(arch, "JNBE %s\n", etiqueta);
     }
     else if (strcmp(comparacion->simbolo, ">=") == 0)
     {
-        itoa(cont, nro, 10);
+        snprintf(nro, STRING_LARGO_MAX + 1, "%d", cont);
         strcat(etiqueta, nro);
         fprintf(arch, "JNAE %s\n", etiqueta);
     }
     else if (strcmp(comparacion->simbolo, "!=") == 0)
     {
-        itoa(cont, nro, 10);
+        snprintf(nro, STRING_LARGO_MAX + 1, "%d", cont);
         strcat(etiqueta, nro);
         fprintf(arch, "JE %s\n", etiqueta);
     }
     else if (strcmp(comparacion->simbolo, "==") == 0)
     {
-        itoa(cont, nro, 10);
+        snprintf(nro, STRING_LARGO_MAX + 1, "%d", cont);
         strcat(etiqueta, nro);
         fprintf(arch, "JNE %s\n", etiqueta);
     } 

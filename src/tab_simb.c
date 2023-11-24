@@ -550,7 +550,7 @@ void imprimirEncabezado(Lista* lista, int cantAux){
 
             //TODO: MODIFICAR ITOA
  
-            itoa(i, numero, 10);
+            snprintf(numero, STRING_LARGO_MAX + 1, "%d", i);
             
             strcat(auxiliar, numero);
             fprintf(arch, "%s dd ?\n",auxiliar);
