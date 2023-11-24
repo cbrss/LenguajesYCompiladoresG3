@@ -50,7 +50,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
     while (padre != NULL)
     {
-       
+   
         if (strcmp(padre->simbolo, "BloEjec") == 0)
         {
             generarCodigo(arch, listaSimbolos, &padre->der);
@@ -94,6 +94,7 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             {
                 sacarPunto(padre->der->simbolo);
                 fprintf(arch, "FLD %s\n", padre->der->simbolo);
+               
                 fprintf(arch, "FSTP %s\n", padre->izq->simbolo);
             }
             else if (strcmp(auxTipo, "Int") == 0)
@@ -115,6 +116,10 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             //si existe un menos, cambio simbolo - por _menos_
             sacarMenosInt(padre->der->simbolo);
             sacarMenosInt(padre->izq->simbolo);
+            sacarPunto(padre->der->simbolo);
+            sacarPunto(padre->izq->simbolo);
+
+
             if (strcmp(padre->simbolo, "+") == 0)
             {
 
@@ -243,12 +248,13 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
             if (strcmp(padre->der->simbolo, "Cuerpo") == 0)
             {
                 existeElse = 1;
+                
             }
 
             if (esComparador(padre->izq->simbolo) == 1)
             { // condicion simple
                 strcpy(etiquetaFalso, "falso");
-                
+               
                 generarCodigoComparador(arch, padre->izq, contFalso, etiquetaFalso);
                 contFalso++;
 
@@ -276,8 +282,10 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
 
                     strcpy(etiquetaVerdadero, "verdadero");
                     generarCodigoComparador(arch, opLogico->izq, contVerdadero, etiquetaVerdadero);
-                    contVerdadero++;
+                   
                     apilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
+                    contVerdadero++;
+
                     // 2da condicion ///ETIQUETA OR
 
                     strcpy(etiquetaOr, "etiquetaOr");
@@ -285,10 +293,11 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                     contOr++;
                     if(existeElse == 1){
                         desapilar(&ifVerdadero, etiquetaVerdadero, sizeof(etiquetaVerdadero));
+                    
                         fprintf(arch, "%s:\n", etiquetaVerdadero);
                         existeElse = 0;
                     }
-
+                    
                     apilar(&ifOr, etiquetaOr, sizeof(etiquetaOr));
                     operadorOr = 1;
                 }
@@ -341,8 +350,8 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
                 if (operadorOr == 1)
                 {
                     //  TODO: cambiar etiqueta a verdadero
-                    desapilar(&ifFalso, etiquetaFalso, sizeof(etiquetaFalso));
-                    fprintf(arch, "%s:\n", etiquetaFalso);
+                    desapilar(&ifFalso, etiquetaVerdadero, sizeof(etiquetaVerdadero));
+                    fprintf(arch, "%s:\n", etiquetaVerdadero);
                     generarCodigo(arch, listaSimbolos, &padre->der);
 
                     desapilar(&ifOr, etiquetaOr, sizeof(etiquetaOr));

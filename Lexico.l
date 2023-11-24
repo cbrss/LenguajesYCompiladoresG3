@@ -94,11 +94,13 @@ MENOR_IGUAL "<="
                     yylval.int_val = atoi(yytext); return INT;}
 
 {FLOAT}         {   if (fa_verificarRangoFloat(yytext) == TRUE){
-                       
+                       printf("\n tengo en lexico: *%s*", yytext);
                         insertarEnLista(&listaSimbolos, yytext, tFLOAT);
                     }; 
                     
-                    yylval.float_val = atof(yytext); return FLOAT;}
+                    //yylval.float_val = atof(yytext); 
+                    strcpy(yylval.string_val, yytext);
+                    return FLOAT;}
 {STRING}        {   if(fa_verificarRangoStr(yytext)){
                         insertarEnLista(&listaSimbolos, yytext, tSTRING);
                     }; 

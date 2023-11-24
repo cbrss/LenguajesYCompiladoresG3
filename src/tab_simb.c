@@ -3,6 +3,15 @@ void sacarEspacios(char *str);
 void sacarPuntos(char* str);
 void borrarComas(char* str);
 void sacarMenos(char* str);
+void sacarDosPuntos(char* str);
+void sacarEspacios(char* str);
+void sacarDosPuntos(char* str);
+void sacarOr(char* str);
+void sacarAnd(char* str);
+void sacarCondMayor(char* str);
+void sacarCondMenor(char* str);
+void sacarIgual(char* str);
+void sacarNegar(char* str);
 
 Lista crearLista(Lista *pl)
 {
@@ -26,9 +35,8 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
     else if (tDato == tINT)
     {
         strcpy(nuevo_simbolo.nombre, "_");
-        strcpy(nuevo_simbolo.valor, nombre);
-       
         strcat(nuevo_simbolo.nombre, nombre);
+        strcpy(nuevo_simbolo.valor, nombre);
         sacarMenos(nuevo_simbolo.nombre);
 
         strcpy(nuevo_simbolo.tipo_dato, TINT);
@@ -37,17 +45,16 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
     }
     else if (tDato == tFLOAT)
     {
-        char strAux[STRING_LARGO_MAX];
 
         strcpy(nuevo_simbolo.nombre, "_");
-        snprintf(strAux, STRING_LARGO_MAX, "%.2f", nombre);
-        
-        strcat(nuevo_simbolo.nombre, strAux);
+        strcat(nuevo_simbolo.nombre, nombre);
         strcpy(nuevo_simbolo.tipo_dato, TFLOAT);
         strcpy(nuevo_simbolo.valor, nombre);
         nuevo_simbolo.longitud = strlen(nombre);
         
         sacarPuntos(nuevo_simbolo.nombre);
+        
+
     }
     else if (tDato == tSTRING)
     {
@@ -66,8 +73,18 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
         strcpy(nuevo_simbolo.tipo_dato, TSTRING);
         
         nuevo_simbolo.longitud = longitud;
-
+  
         sacarEspacios(nuevo_simbolo.nombre);
+        sacarDosPuntos(nuevo_simbolo.nombre);
+        sacarOr(nuevo_simbolo.nombre);
+        sacarOr(nuevo_simbolo.nombre);
+        sacarAnd(nuevo_simbolo.nombre);
+        sacarCondMayor(nuevo_simbolo.nombre);
+        sacarCondMenor(nuevo_simbolo.nombre);
+        sacarNegar(nuevo_simbolo.nombre);
+        sacarIgual(nuevo_simbolo.nombre);
+        sacarIgual(nuevo_simbolo.nombre);
+
     }
 
     while ((*lista != NULL) && strcmp((*lista)->simb.nombre, nuevo_simbolo.nombre) > 0 )
@@ -156,6 +173,195 @@ void sacarMenos(char* str){
     }
 
 }
+
+void sacarDosPuntos(char* str){
+    char aux[STRING_LARGO_MAX + 1];
+    int menos = 0;
+    int j = 0;
+    for(int i = 0; str[i]; i++){
+        
+        if(str[i] == ':'){
+            menos = 1;
+            aux[i] = '_';
+            aux[i+1] = '2';
+            aux[i+2] = 'p';
+            aux[i+3] = 'u';
+            aux[i+4] = 'n';
+            aux[i+5] = 't';
+            aux[i+6] = '_';
+
+            i++;
+            j+=7;
+        }
+        aux[j] = str[i];
+        j++;
+    }
+    aux[j] = '\0';
+    if(menos == 1){
+        strcpy(str, aux);
+    }
+
+}
+void sacarCondMenor(char* str){
+    char aux[STRING_LARGO_MAX + 1];
+    int menos = 0;
+    int j = 0;
+    for(int i = 0; str[i]; i++){
+        
+        if(str[i] == '<'){
+            menos = 1;
+            aux[i] = '_';
+            aux[i+1] = 'm';
+            aux[i+2] = 'e';
+            aux[i+3] = 'n';
+            aux[i+4] = 'o';
+            aux[i+5] = 'r';
+            aux[i+6] = '_';
+
+            i++;
+            j+=7;
+        }
+        aux[j] = str[i];
+        j++;
+    }
+    aux[j] = '\0';
+    if(menos == 1){
+        strcpy(str, aux);
+    }
+
+}
+
+void sacarCondMayor(char* str){
+    char aux[STRING_LARGO_MAX + 1];
+    int menos = 0;
+    int j = 0;
+    for(int i = 0; str[i]; i++){
+        
+        if(str[i] == '>'){
+            menos = 1;
+            aux[i] = '_';
+            aux[i+1] = 'm';
+            aux[i+2] = 'a';
+            aux[i+3] = 'y';
+            aux[i+4] = 'o';
+            aux[i+5] = 'r';
+            aux[i+6] = '_';
+
+            i++;
+            j+=7;
+        }
+        aux[j] = str[i];
+        j++;
+    }
+    aux[j] = '\0';
+    if(menos == 1){
+        strcpy(str, aux);
+    }
+
+}
+
+void sacarAnd(char* str){
+    char aux[STRING_LARGO_MAX + 1];
+    int menos = 0;
+    int j = 0;
+    for(int i = 0; str[i]; i++){
+        
+        if(str[i] == '&'){
+            menos = 1;
+            aux[i] = '_';
+            aux[i+1] = 'a';
+            aux[i+2] = 'n';
+            aux[i+3] = 'd';
+            aux[i+4] = 'l';
+            aux[i+5] = 'o';
+            aux[i+6] = '_';
+
+            i++;
+            j+=7;
+        }
+        aux[j] = str[i];
+        j++;
+    }
+    aux[j] = '\0';
+    if(menos == 1){
+        strcpy(str, aux);
+    }
+
+}
+void sacarOr(char* str){
+    char aux[STRING_LARGO_MAX + 1];
+    int menos = 0;
+    int j = 0;
+    for(int i = 0; str[i]; i++){
+        
+        if(str[i] == '|'){
+            menos = 1;
+            aux[i] = '_';
+            aux[i+1] = 'o';
+            aux[i+2] = 'r';
+            aux[i+3] = '_';
+            i++;
+            j+=4;
+        }
+        aux[j] = str[i];
+        j++;
+    }
+    aux[j] = '\0';
+    if(menos == 1){
+        strcpy(str, aux);
+    }
+
+}
+void sacarIgual(char* str){
+    char aux[STRING_LARGO_MAX + 1];
+    int menos = 0;
+    int j = 0;
+    for(int i = 0; str[i]; i++){
+        
+        if(str[i] == '='){
+            menos = 1;
+            aux[i] = '_';
+            aux[i+1] = 'i';
+            aux[i+2] = 'g';
+            aux[i+3] = '_';
+            i++;
+            j+=4;
+        }
+        aux[j] = str[i];
+        j++;
+    }
+    aux[j] = '\0';
+    if(menos == 1){
+        strcpy(str, aux);
+    }
+}
+void sacarNegar(char* str){
+    char aux[STRING_LARGO_MAX + 1];
+    int menos = 0;
+    int j = 0;
+    for(int i = 0; str[i]; i++){
+        
+        if(str[i] == '!'){
+            menos = 1;
+            aux[i] = '_';
+            aux[i+1] = 'n';
+            aux[i+2] = 'e';
+            aux[i+3] = '_';
+            i++;
+            j+=4;
+        }
+        aux[j] = str[i];
+        j++;
+    }
+    aux[j] = '\0';
+    if(menos == 1){
+        strcpy(str, aux);
+        
+    }
+
+    
+}
+
 
 char* obtenerNombre(Lista *lista, char* valor, char* tDato) {
     while ((*lista != NULL) && (strcmp((*lista)->simb.valor, valor) != 0 || strcmp((*lista)->simb.tipo_dato, tDato) != 0))

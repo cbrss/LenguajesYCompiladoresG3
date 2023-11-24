@@ -16,7 +16,8 @@
 
     char* concatenar(char*, char*, int);
     int estaContenido(char*, char*);
-
+    void invertirCondicionNOT(NodoA *padre);
+    int esPositivo(NodoA * padre);
 
     void maximo();
 
@@ -358,12 +359,16 @@ param_cont_mul:
 
 cte: 
     INT {printf("\t\t\t  Rx4: int es Cte\n"); 
-        snprintf(strAux, sizeof($1), "_%d", $1);
+        snprintf(strAux, VALOR_LARGO_MAX + 1, "_%d", $1);
         CtePtr = crearHoja(strAux);
         strcpy(strAuxAsig, "Int");
     }
     | FLOAT  {printf("\t\t\t  Rx5: float es Cte\n");
-        snprintf(strAux, VALOR_LARGO_MAX, "_%.2f", $1);
+         snprintf(strAux, VALOR_LARGO_MAX, "_%.2f", $1);
+        strcpy(strAux, "_");
+        strcat(strAux,yylval.string_val);
+
+       
         CtePtr = crearHoja(strAux);
         strcpy(strAuxAsig, "Float");
     }
@@ -491,8 +496,8 @@ comparacion:
         
     }
     
-    |NOT comparacion                                            { printf("\t\t\t\tR32: not comparacion es Comparacion\n"); CmpPtr = crearNodo("&", crearHoja("false"), CmpPtr); }
-    |NOT expresion                                              { printf("\t\t\t\tR33: not expresion es Comparacion\n"); CmpPtr = crearNodo("&", crearHoja("false"), Eptr); }
+    |NOT comparacion                                            { printf("\t\t\t\tR32: not comparacion es Comparacion\n"); /*CmpPtr = crearNodo("&", crearHoja("false"), CmpPtr);*/ invertirCondicionNOT(CmpPtr); }
+  
     ;
 
 op_logico:
@@ -545,8 +550,12 @@ factor:
     }
     |FLOAT { 
         printf("\t\t\t\t    R52: FLOAT es Factor\n"); 
+     
+    
         snprintf(strAux, VALOR_LARGO_MAX, "_%.2f", $1);
-      
+        strcpy(strAux, "_");
+        strcat(strAux,yylval.string_val);
+
         strcpy(auxTipo, TFLOAT);
         Fptr= crearHoja(strAux);
     }
@@ -630,3 +639,40 @@ void maximo(){
         cantidadAuxiliares = contadorAuxiliares;
     }
 }
+void invertirCondicionNOT(NodoA *padre)
+{
+    if (strcmp(padre->simbolo, "<") == 0)
+    {
+        strcpy(padre->simbolo, ">=");
+    }
+    else if (strcmp(padre->simbolo, ">") == 0)
+    {
+        strcpy(padre->simbolo, "<=");
+    }
+    else if (strcmp(padre->simbolo, "<=") == 0)
+    {
+        strcpy(padre->simbolo, ">");
+    }
+    else if (strcmp(padre->simbolo, ">=") == 0)
+    {
+        strcpy(padre->simbolo, "<");
+    }
+    else if (strcmp(padre->simbolo, "==") == 0)
+    {
+        strcpy(padre->simbolo, "!=");
+    }
+    else if (strcmp(padre->simbolo, "!=") == 0)
+    {
+        strcpy(padre->simbolo, "==");
+    }
+}
+
+ int esPositivo(NodoA * padre){
+       printf("\n%s\n", padre->simbolo);
+    if(padre->simbolo[0] == '-'){
+        return 1;
+    } else{
+        return 0;
+    }
+
+ }

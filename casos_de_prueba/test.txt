@@ -1,28 +1,36 @@
 init {
     entero_min, a,b,c, entero_max: Int 
-    cad_test5, cad_concat1, cad_test6: String
-    compl1, compl2 : Int
-    compl3 : Float
-    compl4 : String
+    cad_test, cad_concat1, cad_test6: String
+    compl1 : Int
+    compl2 : Float
+    compl3 : String
     contar1, contar2, contar3 : Int
  
 }
 a = 2
 b = 3
 c = 4
+write("valor de a es:")
+write(a)
+write("valor de b es:")
+write(b)
+write("valor de c es:")
+write(c)
+
 write("ejecutando if")
 *- CONDICIONALES -*
     *- Dobles -*
     if (a < b & b < c) {
-        write("write if doble OR")
+       
     }
 
 
-write("ejecutando ciclos")
-ciclo (a > b) {
-    write("ciclo externo anidado ciclo")
-    a = b + 1
-    ciclo (a > c) {
+write("ejecutando ciclos a menor que b")
+write("y a menor igual que c")
+ciclo (a < b) {
+    write("ciclo externo anidado")
+    a = 3
+    ciclo (a <= c) {
         a = c + 1
         write("ciclo interno anidado")
     }
@@ -30,31 +38,28 @@ ciclo (a > b) {
 
 *- FUNCIONES -*
 
-write("hola mundo, escribir valor de cad5")
-read(cad_test5)
-write(cad_test5)
+write("Escribir valor de una cedena")
+read(cad_test)
+write("el valor de la cadena es")
+write(cad_test)
 
 *- CONCATENAR -*
 write("ejecutando concatenarConRecorte")
 cad_concat1 = concatenarConRecorte("hola", "mundo", 2)
 write(cad_concat1)
 
-*- TIMER + estaContenido -*
-write("ejecutando estaContenido con abc, abc")
-if(estaContenido("abcd", "abc")) {
-    write("ejecutando timer")
-    timer(3, write("msjWrite1"))
+*- TIMER -*
 
-}
-
+write("ejecutando Timer")
+timer(3, write("mensaje Timer"))
 
 
 *- Asignacion compleja -*
 write("ejecutando asigCompleja")
-AsigComp([compl1, compl3, compl4] : [1, 2.5, "pepe"])
+AsigComp([compl1, compl2, compl3] : [1, 2.5, "pepe"])
 write(compl1)
+write(compl2)
 write(compl3)
-write(compl4)
 
 write("ejecutando contarDistinto")
 *- Contar distinto -*
