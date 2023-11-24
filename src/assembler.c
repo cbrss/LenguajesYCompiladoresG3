@@ -4,7 +4,7 @@
 int contOp = 1;
 char auxAsm[STRING_LARGO_MAX + 1], auxAsmOp[STRING_LARGO_MAX + 1], auxAsmSimbolo[STRING_LARGO_MAX + 1];
 char auxAsmTipo[STRING_LARGO_MAX + 1], auxAsmIf[ID_LARGO_MAX + 1];
-char auxTipo[STRING_LARGO_MAX + 1], auxValor[STRING_LARGO_MAX + 1];
+char auxTipoAsm[STRING_LARGO_MAX + 1], auxValor[STRING_LARGO_MAX + 1];
 int existeElse = 0; // si es 1 entonces tengo doble condicion
 int contFalso = 0;  //
 int contVerdadero = 0;
@@ -79,25 +79,25 @@ void generarCodigo(FILE *arch, Lista *listaSimbolos, Arbol *arbol)
         if (strcmp(padre->simbolo, "=") == 0)
         {
 
-            strcpy(auxTipo, obtenerTipo(listaSimbolos, padre->izq->simbolo));
+            strcpy(auxTipoAsm, obtenerTipo(listaSimbolos, padre->izq->simbolo));
         
             generarCodigo(arch, listaSimbolos, &padre->der);
          
-            if (strcmp(auxTipo, "String") == 0)
+            if (strcmp(auxTipoAsm, "String") == 0)
             {
                 strncpy(auxValor, padre->der->simbolo + 1, strlen(padre->der->simbolo) - 2); // substring del simbolo sin las ""
                 auxValor[strlen(padre->der->simbolo) - 2] = '\0';
                 fprintf(arch, "mov si, OFFSET %s\nmov di, OFFSET %s\nSTRCPY\n",obtenerNombre(listaSimbolos, auxValor, TSTRING), padre->izq->simbolo );
                
             }
-            else if (strcmp(auxTipo, "Float") == 0)
+            else if (strcmp(auxTipoAsm, "Float") == 0)
             {
                 sacarPunto(padre->der->simbolo);
                 fprintf(arch, "FLD %s\n", padre->der->simbolo);
                
                 fprintf(arch, "FSTP %s\n", padre->izq->simbolo);
             }
-            else if (strcmp(auxTipo, "Int") == 0)
+            else if (strcmp(auxTipoAsm, "Int") == 0)
             {   
                 fprintf(arch, "FLD %s\n", padre->der->simbolo);
                 fprintf(arch, "FRNDINT\n");
