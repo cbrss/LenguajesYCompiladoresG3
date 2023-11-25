@@ -1,13 +1,19 @@
 init {
     entero_min, a,b,c, entero_max: Int 
     d : Float
-    cad_test, cad_concat1, cad_test6: String
+    cad_test, cad_concat1: String
     compl1 : Int
     compl2 : Float
     compl3 : String
     contar1, contar2, contar3 : Int
  
 }
+contar1 = 2
+contar2 = 40
+contar3 = 50
+cad_test = "hola mundo"
+write("valor de la cadena cadtest es:")
+write(cad_test)
 a = 2
 b = 3
 c = 4
@@ -20,6 +26,7 @@ write("valor de int c es:")
 write(c)
 write("valor de float d es:")
 write(d)
+
 
 write("ejecutando if")
 
@@ -60,7 +67,6 @@ timer(3, write("mensaje Timer"))
 
 *- Asignacion compleja -*
 write("ejecutando asigCompleja")
-write("asignando: 1 2.5 pepe")
 AsigComp([compl1, compl2, compl3] : [1, 2.5, "pepe"])
 write("resultado de la asignacion:")
 write(compl1)

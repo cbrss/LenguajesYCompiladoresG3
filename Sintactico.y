@@ -477,24 +477,6 @@ comparacion:
         CmpPtr = crearNodo(cmpAux, EptrAux, Eptr); 
         contadorAuxiliares = 0;
     }
-    |ESTA_CONT PA STRING { strcpy(strAux, $3); } COMA STRING PC { printf("\t\t\t\tR31: estaContenido(String, String) es Comparacion\n"); 
-        CmpPtr = crearNodo("estaContenido", crearHoja(strAux), crearHoja(yylval.string_val));
-        insertarEnLista(&listaSimbolos, "1", tINT);
-        insertarEnLista(&listaSimbolos, "_temp", tID);
-        /*
-        if(estaContenido(strAux, yylval.string_val) == 1){
-            CmpPtr = crearNodo("==", crearHoja("_1"), crearHoja("_1"));
-            insertarEnLista(&listaSimbolos, "1", tINT);
-        } else{
-            CmpPtr = crearNodo("==", crearHoja("_1"), crearHoja("_0"));
-            insertarEnLista(&listaSimbolos, "1", tINT);
-            insertarEnLista(&listaSimbolos, "0", tINT);
-        }*/
-        
-        
-        
-    }
-    
     |NOT comparacion                                            { printf("\t\t\t\tR32: not comparacion es Comparacion\n"); /*CmpPtr = crearNodo("&", crearHoja("false"), CmpPtr);*/ invertirCondicionNOT(CmpPtr); }
   
     ;

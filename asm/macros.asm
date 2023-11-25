@@ -263,12 +263,10 @@ JE @@CONCAT
 
 
     strcat
-    pop di
-    pop si
-    inc si
-    inc si
+  
     STRCPY
     
+  
 @@TERMINAR:
 
 ENDM

@@ -50,7 +50,6 @@ WRITE       "write"
 READ        "read"
 CONCAT      "concatenarConRecorte"
 TIMER       "timer"
-ESTA_CONT   "estaContenido"
 ASIGCOMP    "AsigComp"
 CONT        "!cont"
 /* ID, TODO: Agregar guiones? */
@@ -116,7 +115,6 @@ MENOR_IGUAL "<="
 {READ}          {return READ;}
 {CONCAT}        {return CONCAT;}
 {TIMER}         {return TIMER;}
-{ESTA_CONT}     {return ESTA_CONT;}
 {ASIGCOMP}      {return ASIGCOMP;}
 {CONT}          {return CONT;}
 {ID}            {
