@@ -71,7 +71,7 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
         strcpy(nuevo_simbolo.tipo_dato, TSTRING);
         
         nuevo_simbolo.longitud = longitud;
-        printf("\ncad: *%s*", nuevo_simbolo.nombre);
+
         sacarEspacios(nuevo_simbolo.nombre);
         sacarDosPuntos(nuevo_simbolo.nombre);
         sacarOr(nuevo_simbolo.nombre);
@@ -82,7 +82,7 @@ void insertarEnLista(Lista *lista, char *nombre, enum tiposDato tDato)
         sacarNegar(nuevo_simbolo.nombre);
         sacarIgual(nuevo_simbolo.nombre);
         sacarIgual(nuevo_simbolo.nombre);
-        printf("\ncad: *%s*", nuevo_simbolo.nombre);
+
     }
 
     while ((*lista != NULL) && strcmp((*lista)->simb.nombre, nuevo_simbolo.nombre) > 0 )
